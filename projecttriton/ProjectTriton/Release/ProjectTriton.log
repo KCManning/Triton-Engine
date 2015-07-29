@@ -1,0 +1,99 @@
+﻿Build started 7/29/2015 12:28:59 PM.
+     1>Project "C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Armature.cpp Camera.cpp Display.cpp Engine.cpp Game.cpp Input.cpp main.cpp Mesh.cpp ObjectEntity.cpp SceneLevel.cpp Shader.cpp Texture.cpp Utilities.cpp
+         Armature.cpp
+         Camera.cpp
+         Display.cpp
+         Engine.cpp
+         Game.cpp
+         Input.cpp
+         main.cpp
+         Mesh.cpp
+         ObjectEntity.cpp
+         SceneLevel.cpp
+         Shader.cpp
+         Texture.cpp
+         Utilities.cpp
+     1>Utilities.cpp(510): warning C4018: '<' : signed/unsigned mismatch
+     1>Utilities.cpp(565): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Release\ProjectTriton.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Release\ProjectTriton.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Release\ProjectTriton.lib" /MACHINE:X86 /SAFESEH Release\Armature.obj
+         Release\Camera.obj
+         Release\Display.obj
+         Release\Engine.obj
+         Release\Game.obj
+         Release\Input.obj
+         Release\main.obj
+         Release\Mesh.obj
+         Release\ObjectEntity.obj
+         Release\SceneLevel.obj
+         Release\Shader.obj
+         Release\Texture.obj
+         Release\Utilities.obj
+     1>Camera.obj : error LNK2001: unresolved external symbol _SDL_GetKeyboardState
+     1>Camera.obj : error LNK2001: unresolved external symbol _SDL_SetRelativeMouseMode
+     1>Camera.obj : error LNK2001: unresolved external symbol _SDL_GetRelativeMouseMode
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glClear@4
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glClearColor@16
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_DestroyWindow
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GL_DeleteContext
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glewInit@0
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GL_SwapWindow
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_SetWindowFullscreen
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_CreateWindow
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GL_CreateContext
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_SetWindowSize
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glCullFace@4
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_WasInit
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GetError
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GL_SetAttribute
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_GetWindowSize
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glEnable@4
+     1>Display.obj : error LNK2001: unresolved external symbol _SDL_SetWindowTitle
+     1>Display.obj : error LNK2001: unresolved external symbol __imp__glFrontFace@4
+     1>Engine.obj : error LNK2001: unresolved external symbol _SDL_Init
+     1>Engine.obj : error LNK2001: unresolved external symbol _SDL_PollEvent
+     1>Engine.obj : error LNK2001: unresolved external symbol _SDL_ClearError
+     1>Engine.obj : error LNK2001: unresolved external symbol _SDL_GetTicks
+     1>Engine.obj : error LNK2001: unresolved external symbol _SDL_Quit
+     1>main.obj : error LNK2001: unresolved external symbol __imp____glewDeleteVertexArrays
+     1>main.obj : error LNK2001: unresolved external symbol __imp____glewDeleteBuffers
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBindBuffer
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewVertexAttribPointer
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp__glDrawElements@16
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewGenVertexArrays
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBufferData
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBindVertexArray
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp__glDrawArrays@12
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewGenBuffers
+     1>Mesh.obj : error LNK2001: unresolved external symbol __imp____glewEnableVertexAttribArray
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewValidateProgram
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewDeleteShader
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewCreateShader
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetShaderInfoLog
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewLinkProgram
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewCompileShader
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewUseProgram
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewShaderSource
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewBindAttribLocation
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetProgramiv
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetShaderiv
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetProgramInfoLog
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewCreateProgram
+     1>Shader.obj : error LNK2001: unresolved external symbol __imp____glewAttachShader
+     1>Texture.obj : error LNK2001: unresolved external symbol __imp__glDeleteTextures@8
+     1>Texture.obj : error LNK2001: unresolved external symbol __imp____glewActiveTexture
+     1>Texture.obj : error LNK2001: unresolved external symbol __imp__glBindTexture@8
+     1>Texture.obj : error LNK2001: unresolved external symbol __imp__glTexImage2D@36
+     1>Texture.obj : error LNK2001: unresolved external symbol _SDL_GetRGBA
+     1>Texture.obj : error LNK2001: unresolved external symbol __imp__glGenTextures@8
+     1>Texture.obj : error LNK2001: unresolved external symbol _IMG_Load
+     1>Texture.obj : error LNK2001: unresolved external symbol _SDL_FreeSurface
+     1>LIBCMT.lib(crt0.obj) : error LNK2001: unresolved external symbol _main
+     1>C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Release\ProjectTriton.exe : fatal error LNK1120: 60 unresolved externals
+     1>Done Building Project "C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:06.88

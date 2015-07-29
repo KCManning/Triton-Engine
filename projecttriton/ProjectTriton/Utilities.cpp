@@ -45,7 +45,7 @@ Game* Triton::parseGameFile(const char* filepath)
 			{
 				if (*it == "directory")
 					sceneDirectory.append(*(++it));
-				else 
+				else
 				{
 					const string sceneID = *it;
 					const string sceneFile = *(++it);
@@ -65,7 +65,7 @@ Game* Triton::parseGameFile(const char* filepath)
 			} // end of while
 		} // end of else if (*it == "scenes")
 	} // end of for
-	
+
 	tokens.clear();
 
 	return game;
@@ -89,7 +89,7 @@ void Triton::parseSceneFile(const char* filepath, Game * game)
 		else if (*it == "assets")
 		{
 			string assetDirectory = game->directory;
-			
+
 			while (*(++it) != "/assets")
 			{
 				if (*it == "directory")
@@ -105,7 +105,7 @@ void Triton::parseSceneFile(const char* filepath, Game * game)
 		else if (*it == "objects")
 		{
 			string objectDirectory = game->directory;
-			
+
 			while (*(++it) != "/objects")
 			{
 				if (*it == "directory")
@@ -153,8 +153,10 @@ list<string> Triton::split(const string &data)
 			while (*(++it) != '"')
 				token.push_back(*it);
 			// token needs to be pushed back even if it's empty in this case
-			output.push_back(token); 
+			output.push_back(token);
 			token.clear();
+			break;
+		case '\t':
 			break;
 		case '<': case '>': case '=': case '/': case ' ': case ',': case ';': case '\'':
 			if (token != "")
@@ -177,7 +179,7 @@ list<string> Triton::split(const string &data)
 			token.push_back(*it);
 		}
 	}
-		
+
 	return output;
 }
 
@@ -264,8 +266,7 @@ list<string> Triton::parseOutComments(const char* filepath)
 }
 
 // returns a map iterator so that position can be set later by scene file parser for the object
-unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(
-	const char* filepath, SceneLevel * scene)
+unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const char* filepath, SceneLevel * scene)
 {
 	list<string> tokens = parseOutComments(filepath);
 
@@ -297,3 +298,289 @@ unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(
 
 	return scene->objects.emplace(id, object).first;
 }
+
+#pragma region Parsers
+void Triton::parse(Mesh type)
+{
+	string filePath = "../Models/";
+	string sFileName = "bend.xml";
+	string wholeLine;
+	ifstream dataFile;
+
+
+	string m_FileName = filePath + sFileName;
+
+	vector<vec3> m_positions;
+	vector<vec2> m_texCoords;
+	vector<vec3> m_normals;
+	unsigned int** m_Faces;
+	unsigned int* m_FacesIndex;
+	mat4 m_Matrix;
+
+	dataFile.open(m_FileName);
+
+	int testTracking = 0;
+
+	while (getline(dataFile, wholeLine))
+	{
+		testTracking++;
+		list<string> parts = split(wholeLine);
+
+		string sType = parts.front();
+		if (!strcmp(sType.c_str(), "matrix"))
+		{
+			if (parts.size() > 2)
+			{
+				parts.pop_front();
+				parts.pop_front();
+			}
+
+			sType = parts.front();
+
+			if (!strcmp(sType.c_str(), "Space"))
+			{
+				getline(dataFile, wholeLine);
+
+				for (int i = 0; i < 4; i++)
+				{
+					getline(dataFile, wholeLine);
+					list<string> matrices = split(wholeLine);
+
+					for (int j = 0; j < 4; j++)
+					{
+						float x = stof(matrices.front());
+						matrices.pop_front();
+
+						m_Matrix[i][j] = x;
+					}
+				}
+
+			}
+		}
+		else if (!strcmp(sType.c_str(), "vertices"))
+		{
+			parts.pop_front();
+			parts.pop_front();
+
+			int count = stoi(parts.front());
+
+			for (int i = 0; i < count; i++)
+			{
+				getline(dataFile, wholeLine);
+				list<string> vertices = split(wholeLine);
+
+				float x = stof(vertices.front());
+				vertices.pop_front();
+				float y = stof(vertices.front());
+				vertices.pop_front();
+				float z = stof(vertices.front());
+				vertices.pop_front();
+
+				vec3 vert(x, y, z);
+
+				m_positions.push_back(vert); //Vertices
+
+			}//end for
+
+			getline(dataFile, wholeLine);
+		}
+		else if (!strcmp(sType.c_str(), "UVs"))
+		{
+			parts.pop_front();
+			parts.pop_front();
+
+			int count = stoi(parts.front());
+
+			for (int i = 0; i < count; i++)
+			{
+				getline(dataFile, wholeLine);
+				list<string> vertices = split(wholeLine);
+
+				float x = stof(vertices.front());
+				vertices.pop_front();
+				float y = stof(vertices.front());
+				vertices.pop_front();
+
+				vec2 uvs(x, y);
+
+				m_texCoords.push_back(uvs); // UVs
+
+			}//end for
+
+			getline(dataFile, wholeLine);
+
+		}
+		else if (!strcmp(sType.c_str(), "normals"))
+		{
+			parts.pop_front();
+			parts.pop_front();
+
+			int count = stoi(parts.front());
+
+			for (int i = 0; i < count; i++)
+			{
+				getline(dataFile, wholeLine);
+				list<string> normals = split(wholeLine);
+
+				float x = stof(normals.front());
+				normals.pop_front();
+				float y = stof(normals.front());
+				normals.pop_front();
+				float z = stof(normals.front());
+
+				vec3 norms(x, y, z);
+
+				m_normals.push_back(norms); // normals
+
+			}//end for
+
+			getline(dataFile, wholeLine);
+
+		}
+		else if (!strcmp(sType.c_str(), "faces"))
+		{
+			parts.pop_front();
+			parts.pop_front();
+
+			const unsigned int count = stoul(parts.front()) * 3;
+
+			m_Faces = new unsigned int*[count];
+			m_FacesIndex = new unsigned int[count];
+
+
+			getline(dataFile, wholeLine);
+			unsigned int notUnique = 0;
+
+			for (unsigned int i = 0; i < count; i++)
+			{
+				getline(dataFile, wholeLine);
+
+				m_Faces[i] = new unsigned int[5];
+
+				list<string> face = split(wholeLine);
+				string sNum;
+				unsigned int v = 0;
+				unsigned int w = 0;
+				unsigned int x = 0;
+				unsigned int y = 0;
+				unsigned int z = 0;
+
+				sNum = face.front();
+
+				if (strcmp(sNum.c_str(), "na"))
+					v = stoi(sNum);
+
+				face.pop_front();
+				sNum = face.front();
+
+				if (strcmp(sNum.c_str(), "na"))
+					w = stoi(sNum);
+
+				face.pop_front();
+				sNum = face.front();
+
+				if (strcmp(sNum.c_str(), "na"))
+					x = stoi(sNum);
+
+				face.pop_front();
+				sNum = face.front();
+
+				if (strcmp(sNum.c_str(), "na"))
+					y = stoi(sNum);
+
+				face.pop_front();
+				sNum = face.front();
+
+				if (strcmp(sNum.c_str(), "na"))
+					z = stoi(sNum);
+
+				face.pop_front();
+
+				m_Faces[i][0] = v;
+				m_Faces[i][1] = w;
+				m_Faces[i][2] = x;
+				m_Faces[i][3] = y;
+				m_Faces[i][4] = z;
+
+				
+				bool booUnique = true;
+
+				for (int j = 0; j < i; j++)
+				{
+					booUnique = true;
+
+					for (int k = 0; k < 5; k++)
+					{
+						if (m_Faces[j][k] != m_Faces[i][k])
+						{
+							break;
+						}
+						else if (k == 4)
+						{
+							m_FacesIndex[i] = j;
+							booUnique = false;
+							notUnique++;
+						}
+
+					}//end k
+
+					if (!booUnique)
+						break;
+
+					else
+					{
+
+						m_FacesIndex[i] = j - notUnique;
+					}
+
+
+
+				}//end j
+
+
+			}//end i
+
+
+
+#pragma region Hastable attempts
+			/*unordered_map<string, unsigned int> hashFaces(count);
+			unsigned int j = 0;
+
+			getline(dataFile, wholeLine);
+
+			for (unsigned int i = 0; i < count; i++)
+			{
+			getline(dataFile, wholeLine);
+
+			unordered_map<string, unsigned int>::const_iterator got = hashFaces.find(wholeLine);
+
+			if (got == hashFaces.end())
+			{
+			pair<string, unsigned int> pairedFace(wholeLine, j);
+			hashFaces.insert(pairedFace);
+			j++;
+			}
+			else
+			{
+			pair<string, unsigned int> pairedFace(wholeLine, 0);
+			hashFaces.insert(pairedFace);
+			}
+			}*/
+#pragma endregion
+
+			for (int i = 0; i < count; i++)
+			{
+				cout << m_Faces[i][0] << ", " << m_Faces[i][1] << ", " << m_Faces[i][2] << ", " << m_Faces[i][3] << ", "
+					<< m_Faces[i][4] << endl;
+				cout << "Index: " << m_FacesIndex[i] << endl;
+			}
+			getline(dataFile, wholeLine);//Deletes the </faces> line
+
+		}//end if
+
+	}// end loop
+
+
+	dataFile.close();
+}
+#pragma endregion

@@ -10,7 +10,8 @@ int main(int argc, char** argv)
 	try	
 	{
 		Engine engine;
-		
+
+
 		int i = 0;
 		
 		while (!engine.Quit)
