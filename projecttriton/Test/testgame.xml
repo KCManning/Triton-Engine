@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<game directory="../Test/">
+	<!--settings-->
+	<window>
+		<resolution>
+			800, 600;
+		</resolution>
+		<fullscreen>
+		<!--
+			false, -; parser ignores second parameter if any
+			true, false; sets window to full screen at specified resolution
+			true, true; sets window to full screen at desktop resolution, overwrites resolution attribute
+		-->
+			true, true;
+		</fullscreen>
+		<title>
+			"Test";
+		</title>
+	</window>
+	<!--
+	--not ready--
+	<properties>
+	</properties>
+	
+	--load assets and scenes into memory at start--
+	<pre-load>false;</pre-load>
+	-->
+	<!--list of scene directories-->
+	<scenes directory="Scenes/">
+	<!--first scene should always be the first element in the scenes attribute, elements consists of the scene id and scene file-->
+		"Test Scene", "testScene.xml";
+	</scenes>
+	<!--
+	<inputs>
+		<event_types>
+			
+		</event_types>
+		<bindings>
+			LEFT_MOUSE_DOWN, 
+		</bindings>
+	</inputs>
+	-->
+</game>

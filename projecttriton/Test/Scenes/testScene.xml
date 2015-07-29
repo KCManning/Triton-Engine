@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene id="Test Scene">
+	<assets>
+		"Models/bend.xml";
+	</assets>
+	<!--object attribute should always be after assets-->
+	<objects directory="Objects/">
+		<!--if directory is in attribute declaration it is concatenated with any path in the game directory-->
+		<!--sub-attribute directories will be concatenated with attribute directories and game directory-->
+		<!--note directory could be 'Characters/' or 'Weapons/' and whatnot-->
+		<object>
+			<!--object files can only contain one object-->
+			<file>
+				"testObject.xml";
+			</file>
+			<position>
+				0.0, 0.0, 0.0;
+			</position>
+			<!--not yet implemented--
+			--scene specific properties--
+			<properties>
+			</properties>
+			<!--not yet implemented--
+			--scene specific event handles--
+			<events>
+			</events>
+			-->
+		</object>
+	</objects>
+	<!--not yet implemented--
+	<scripts
+	</scripts
+	<!--not yet implemented--
+	<properties
+	</properties
+	<!--not yet implemented--
+	<events
+		<!--game wide events still must be put here and defined for each object in each scene--
+	</events
+	-->
+</scene>

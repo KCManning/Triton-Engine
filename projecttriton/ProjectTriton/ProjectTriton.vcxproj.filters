@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Script Classes">
+      <UniqueIdentifier>{3c44a4af-539a-4486-af77-0b16222e128b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asset Classes">
+      <UniqueIdentifier>{d8f77ad5-e0a4-4d5b-93e5-7ac03d2cb56a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Script Classes">
+      <UniqueIdentifier>{51f12512-662d-498d-a39b-33efa53b895c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asset Classes">
+      <UniqueIdentifier>{e19de1c1-758c-4696-a69c-0c79339c3ab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Display Objects">
+      <UniqueIdentifier>{08baa665-4b20-4223-b146-edffd6ca3774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Display Objects">
+      <UniqueIdentifier>{7e47e59f-c837-4ff3-ba21-beb0caceeaf9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLevel.cpp">
+      <Filter>Source Files\Script Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Script Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Armature.cpp">
+      <Filter>Source Files\Asset Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Asset Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Asset Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Asset Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectEntity.cpp">
+      <Filter>Source Files\Script Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Display Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Display.cpp">
+      <Filter>Source Files\Display Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\Script Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLevel.h">
+      <Filter>Header Files\Script Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Armature.h">
+      <Filter>Header Files\Asset Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Asset Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Asset Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Asset Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectEntity.h">
+      <Filter>Header Files\Script Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Asset Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Display Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Display.h">
+      <Filter>Header Files\Display Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

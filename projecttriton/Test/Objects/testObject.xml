@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object id="Test">
+	<mesh>
+		Cube;
+	</mesh>
+	<armature>
+		Armature;
+	</armature>
+	<idle_anim>
+		Pose;
+	</idle_anim>
+	<material>
+		Grid;
+	</material>
+	<!--
+	--not yet implemented
+	<properties> -- things such as say hp and what not
+	<events> -- event handle scripts
+	<scripts> -- special scripts and/or functions called by this object
+	-->
+</object>
