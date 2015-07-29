@@ -64,7 +64,7 @@ void Camera::input(SDL_Event& e)
 				throw "Couldn't not set relative mouse mode.";
 	if (e.type == SDL_MOUSEMOTION)
 		if (SDL_GetRelativeMouseMode())
-			Rotate(atanf(e.motion.yrel / (ViewWidth)), atanf(-e.motion.xrel / (ViewHeight)), 0.f);
+			Rotate(atanf(e.motion.yrel / float(ViewWidth)), atanf(-e.motion.xrel / float(ViewHeight)), 0.f);
 	if (e.type == SDL_KEYDOWN)
 	{
 		switch (e.key.keysym.sym)
