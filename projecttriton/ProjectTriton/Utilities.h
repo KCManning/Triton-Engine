@@ -38,7 +38,7 @@ namespace Triton
 	//Parser(Scene type) : m_FileName(FilePath + sFileName) { run(type); }
 	//Parser(Object type) : m_FileName(FilePath + sFileName) { run(type); }
 
-	void parse(Mesh type);
+	void parse(Mesh type, const char* filepath);
 	//void parse(Armature type);
 	//void parse(Game type);
 	//void parse(Scene type);

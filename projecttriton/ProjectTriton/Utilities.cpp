@@ -300,7 +300,7 @@ unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const ch
 }
 
 #pragma region Parsers
-void Triton::parse(Mesh type)
+void Triton::parse(Mesh type, const char* filepath)
 {
 	string filePath = "../Models/";
 	string sFileName = "bend.xml";
@@ -350,7 +350,7 @@ void Triton::parse(Mesh type)
 					{
 						float x = stof(matrices.front());
 						matrices.pop_front();
-
+						
 						m_Matrix[i][j] = x;
 					}
 				}
@@ -377,8 +377,8 @@ void Triton::parse(Mesh type)
 				vertices.pop_front();
 
 				vec3 vert(x, y, z);
-
-				m_positions.push_back(vert); //Vertices
+				type.vertices.push_back(vert);
+				//m_positions.push_back(vert); //Vertices
 
 			}//end for
 
@@ -402,8 +402,7 @@ void Triton::parse(Mesh type)
 				vertices.pop_front();
 
 				vec2 uvs(x, y);
-
-				m_texCoords.push_back(uvs); // UVs
+				type.UVs.push_back(uvs); // UVs
 
 			}//end for
 
@@ -429,8 +428,7 @@ void Triton::parse(Mesh type)
 				float z = stof(normals.front());
 
 				vec3 norms(x, y, z);
-
-				m_normals.push_back(norms); // normals
+				type.normals.push_back(norms); // normals
 
 			}//end for
 
