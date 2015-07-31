@@ -317,7 +317,7 @@ void Triton::parse(Mesh type, const char* filepath)
 	unsigned int* m_FacesIndex;
 	mat4 m_Matrix;
 
-	dataFile.open(m_FileName);
+	dataFile.open(filepath);
 
 	int testTracking = 0;
 
