@@ -30,33 +30,12 @@ namespace Triton
 	list<string> parseOutComments(const char* filepath);
 	list<string> split(const string &data);
 
-	//string FilePath = "../Models/";
-	//string sFileName = "cube_animation_proper.xml";
-	//Utility(Mesh type) : m_FileName(FilePath + sFileName) { run(type); }
-	//Parser(Armature type) : m_FileName(FilePath + sFileName) { run(type); }
-	//Parser(Game type) : m_FileName(FilePath + sFileName) { run(type); }
-	//Parser(Scene type) : m_FileName(FilePath + sFileName) { run(type); }
-	//Parser(Object type) : m_FileName(FilePath + sFileName) { run(type); }
-
 	void parse(Mesh type, const char* filepath);
 	//void parse(Armature type);
 	//void parse(Game type);
 	//void parse(Scene type);
 	//void parse(Object type);
 
-	Mesh getMesh(Mesh mesh);
-
-	//short m_countVerts;
-	//short m_countUVs;
-	//short m_countNormals;
-	//short m_countFaces;
-
-	//string m_FileName;
-
-	//vector<vec3> m_positions;
-	//vector<vec2> m_texCoords;
-	//vector<vec3> m_normals;
-	//unsigned int** m_Faces;
-	//mat4 m_Matrix;
+	Mesh getMesh(Mesh mesh); //*** Holdover?
 
 }

@@ -327,6 +327,7 @@ void Triton::parse(Mesh type, const char* filepath)
 		list<string> parts = split(wholeLine);
 
 		string sType = parts.front();
+#pragma region Matrix
 		if (!strcmp(sType.c_str(), "matrix"))
 		{
 			if (parts.size() > 2)
@@ -357,6 +358,9 @@ void Triton::parse(Mesh type, const char* filepath)
 
 			}
 		}
+#pragma endregion
+
+#pragma region Vertices
 		else if (!strcmp(sType.c_str(), "vertices"))
 		{
 			parts.pop_front();
@@ -384,6 +388,9 @@ void Triton::parse(Mesh type, const char* filepath)
 
 			getline(dataFile, wholeLine);
 		}
+#pragma endregion
+
+#pragma region UVs
 		else if (!strcmp(sType.c_str(), "UVs"))
 		{
 			parts.pop_front();
@@ -409,6 +416,9 @@ void Triton::parse(Mesh type, const char* filepath)
 			getline(dataFile, wholeLine);
 
 		}
+#pragma endregion
+
+#pragma region Normals
 		else if (!strcmp(sType.c_str(), "normals"))
 		{
 			parts.pop_front();
@@ -435,6 +445,9 @@ void Triton::parse(Mesh type, const char* filepath)
 			getline(dataFile, wholeLine);
 
 		}
+#pragma endregion
+
+#pragma region Faces
 		else if (!strcmp(sType.c_str(), "faces"))
 		{
 			parts.pop_front();
@@ -575,6 +588,7 @@ void Triton::parse(Mesh type, const char* filepath)
 			getline(dataFile, wholeLine);//Deletes the </faces> line
 
 		}//end if
+#pragma endregion
 
 	}// end loop
 
