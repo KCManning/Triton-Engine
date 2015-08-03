@@ -31,8 +31,8 @@ namespace Triton
 	list<string> split(const string &data);
 
 	void parse(Mesh type, const char* filepath);
-	//void parse(Armature type);
-	//void parse(Game type);
+	void parse(Armature type, const char* filepath);
+	void parse(Game type, const char* filepath);
 	//void parse(Scene type);
 	//void parse(Object type);
 

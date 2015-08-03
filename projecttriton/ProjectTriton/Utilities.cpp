@@ -596,3 +596,9 @@ void Triton::parse(Mesh type, const char* filepath)
 	dataFile.close();
 }
 #pragma endregion
+
+void parse(Armature type, const char* filepath)
+{}
+
+void parse(Game type, const char* filepath)
+{}
