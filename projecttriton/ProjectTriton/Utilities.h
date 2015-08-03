@@ -36,6 +36,6 @@ namespace Triton
 	//void parse(Scene type);
 	//void parse(Object type);
 
-	Mesh getMesh(Mesh mesh); //*** Holdover?
+	//Mesh getMesh(Mesh mesh); //*** Holdover?
 
 }
