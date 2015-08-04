@@ -28,7 +28,7 @@ Engine::Engine()
 
 void Engine::update()
 {
-	if (SDL_PollEvent(&m_event))
+	while (SDL_PollEvent(&m_event))
 	{
 		// checking if exit button was pressed
 		if (m_event.type == SDL_QUIT)
