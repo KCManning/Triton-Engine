@@ -3,24 +3,23 @@
 
 using namespace Triton;
 
-Texture::Texture(const char* textureFile)
+void Texture::load(const char* textureFile)
 {
-	error = false;
 	// creates a temporary SDL Surface from the image file
-	SDL_Surface* tempSurface = IMG_Load(strcat("../Textures/", textureFile));
+	SDL_Surface* tempSurface = IMG_Load(textureFile);
 	// checks if an error occurred when creating the surface
 	if (tempSurface == NULL)
 	{
-		error = true;
-		strcat(errorMessage, IMG_GetError());
+		string errorMsg = "failed to load texture: ";
+		throw (errorMsg + '"' + textureFile + '"' + IMG_GetError()).c_str();
 	}
 	
 	// number of pixels, multiplied by the number of components in each pixel, 
 	// can reach over 64,000, the range of a short
 	unsigned int pixelDataCount = tempSurface->pitch * tempSurface->h;
 
-	pixels = new unsigned char[pixelDataCount];
-	
+	// pixels = new unsigned char[pixelDataCount];
+	pixels.resize(pixelDataCount, 0);
 	// iterates through each pixel
 	for (int i = 0; i < tempSurface->w * tempSurface->h; ++i)
 	{
@@ -42,7 +41,7 @@ Texture::Texture(const char* textureFile)
 	glBindTexture(GL_TEXTURE_2D, handle);
 	// fills the texture object with information from the pixels array
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempSurface->w, tempSurface->h, 0, GL_RGBA, 
-		GL_UNSIGNED_BYTE, pixels);
+		GL_UNSIGNED_BYTE, pixels.data());
 
 	// releases the temporary SDL_surface from memory
 	SDL_FreeSurface(tempSurface);
@@ -68,11 +67,7 @@ Texture::~Texture()
 	// deletes texture from openGL context
 	glDeleteTextures(1, &handle);
 	// releases pixels array from memory
-	if (pixels != nullptr)
-		delete[] pixels;
-	// releases errorMessage string from memory
-	if (errorMessage != nullptr)
-		delete[] errorMessage;
+	pixels.clear();
 }
 
 Uint32 Triton::getPixel(SDL_Surface* surface, int i)

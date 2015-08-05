@@ -15,7 +15,7 @@ namespace Triton
 	class Shader
 	{
 	public:
-		// attributes
+		// vertex attributes in shader
 		enum Attribs
 		{
 			VERTEX,
@@ -39,29 +39,25 @@ namespace Triton
 		// or GL_FRAGMENT_SHADER
 		struct ShaderComponent
 		{
-			// index in Shader::Components
-			unsigned short index;
-			
 			// handle openGL returned that references the shader
 			GLint handle;
 
-			// true if there was an error during shader creation or linking
-			bool error;
-	
 			// contructor: 
 			// shaderType = type of shader(compute, vertex, tess, etc.)
 			// GLSLstrings = strings of the glsl file
-			ShaderComponent(GLenum shaderType, string& GLSLstrings, unsigned short comp_index);
+			ShaderComponent(GLenum shaderType, string& GLSLstrings);
 	
 			// destructor
 			~ShaderComponent(){ glDeleteShader(handle); }
 		};
-	
-		// true if there was an error during program creation or linking
-		bool error;
+		// the currently active shader
+		static GLint active;
 
 		// static array of shader pieces that all shader programs can access
-		static list<ShaderComponent> Components;
+		static list<ShaderComponent*> Components;
+
+		// clears the Components list, make sure to call this 
+		static void clearComponents();
 	
 		// static function that adds a shader component to the list and returns the index
 		// of that component in the Components array
@@ -70,7 +66,7 @@ namespace Triton
 		static unsigned short createComponent(string& GLSLstrings, GLenum shaderType);
 		
 		// default contructor
-		Shader() { handle = NULL; error = false; }
+		Shader() { handle = NULL; }
 
 		// array of indices to Components to use for this program in order 
 		// i.e. vertex shader first, frag shader last
@@ -78,23 +74,10 @@ namespace Triton
 
 		// sets this as the program openGL is currently using
 		void bind();
-
-		// clears the Components list, make sure to call this 
-		void clearComponents() { Components.clear(); }
 	
 		// destructor
-		~Shader()
-		{
-			// should delete the array of component pointers not the components
-			m_components.clear();
-			list<ShaderComponent*>::iterator it = m_components.begin();
-			for (unsigned short i = 0; i < m_components.size(); ++i)
-			{
-				glDetachShader(handle, (*it)->handle);
-				++it;
-			}
-			glDeleteProgram(handle);
-		}
+		~Shader();
+		
 		// shader program handle
 		GLint handle;
 	
@@ -109,7 +92,8 @@ namespace Triton
 	// isProgram = true, if shaderHandle is a program handle, false if component handle
 	// errorMessage = errorMessage to be concatenated to openGL's error message
 	// errorMessage: 'error'
-	bool checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,
+	// return false if no error and true if an error occured
+	void checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,
 		const string& errorMessage);
 }
 

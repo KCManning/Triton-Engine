@@ -7,7 +7,7 @@ using namespace std;
 
 namespace Triton
 {
-	// class that stores scene/level files to be loaded, and 
+	// class that stores scene/SceneLevel files to be loaded, and 
 	// object/entity types(like say a character or weapon) this game uses, 
 	// game settings and directories
 	class Game
@@ -17,7 +17,6 @@ namespace Triton
 		//unordered_map<string, SceneLevel> sceneMap;
 		// the current scene being displayed
 		SceneLevel* currentScene;
-		string currentSceneID;
 		// Game's Directory
 		string directory;
 		// window size settings
@@ -44,7 +43,7 @@ namespace Triton
 		// ends the games, and what to call when a quit event happens, such as SDL_QUIT
 		void quit();
 		// destructor
-		~Game();
+		~Game(){ quit(); }
 	private:
 
 	};

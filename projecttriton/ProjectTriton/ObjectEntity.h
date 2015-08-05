@@ -5,10 +5,6 @@
 #include "Mesh.h"
 #include "Armature.h"
 #include "Material.h"
-#include "Texture.h"
-#include "Shader.h"
-
-#include <unordered_map>
 
 namespace Triton
 {
@@ -21,13 +17,13 @@ namespace Triton
 		// objects position in 3d space
 		vec3 position;
 
-		unordered_map<string, Mesh*>::const_iterator mesh;
-		// pointer to default values of the armature this mesh uses
-		unordered_map<string, Armature*>::const_iterator armatureID;
-		unordered_map<string, Material*>::const_iterator material;
+		Mesh* mesh;
+		Armature* armature;
+		Material* material;
 
-		// armature as is manipulated and animated by this object
-		Armature armature;
+		// mesh is manipulated and animated by this object, a copy of the object pointed by 
+		// armature
+		Armature rig;
 
 		// event handles; changes private values that move are referenced by update
 		void input(SDL_Event& e);
@@ -35,7 +31,9 @@ namespace Triton
 		// return true
 		void update();
 
-		ObjectEntity() {}
+		void draw();
+
+		ObjectEntity();
 		~ObjectEntity();
 	private:
 

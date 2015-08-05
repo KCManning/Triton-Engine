@@ -26,24 +26,6 @@ namespace Triton
 			INDEX_BUFFER,
 			MAX_BUFFER_COUNT
 		};
-
-		// perhaps an enum of uniforms
-		enum Uniforms
-		{
-			PENDING,
-		};
-
-
-		// just mesh config check variables of what kind of mesh it is, probably better than 
-		// making a complicated inheritance tree
-		bool haveUVs;
-		bool haveNormals;
-		bool haveTangentSpace;
-		bool isWeighted;
-		bool isIndexed;
-		bool error;
-		bool empty;
-		string errorMessage;
 		
 		// position in 3d space
 		vector<vec3> vertices;
@@ -72,28 +54,14 @@ namespace Triton
 		GLuint vao;
 		// handles for the pieces of the mesh, each vector array available, reduce buffer object count
 		GLuint vbo[MAX_BUFFER_COUNT];
-		// number of vector arrays available
-		unsigned short bufferCount;
 		
-		Mesh(vec3* _vertices = nullptr, vec2* _UVs = nullptr, vec3* _normals = nullptr, 
-			vec3* _tangents = nullptr, bool* _bitangent_signs = nullptr, vec4* _weights = nullptr, 
-			uvec4* _groups = nullptr, unsigned int* _indices = nullptr);
+		Mesh() {}
 
 		// draws the mesh in the openGL context
 		void draw();
+
+		void init();
 	
-		~Mesh()
-		{
-			glDeleteBuffers(bufferCount, vbo);
-			glDeleteVertexArrays(1, &vao);
-			
-			vertices.clear();
-			UVs.clear();
-			normals.clear();
-			tangents.clear();
-			weights.clear();
-			groups.clear();
-			indices.clear();
-		}
+		~Mesh();
 	};
 }

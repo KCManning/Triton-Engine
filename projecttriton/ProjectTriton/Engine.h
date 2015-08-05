@@ -1,10 +1,6 @@
 //-------------------------------------------------------------------------------------------------
-#include "SDL2\SDL.h"
 #include "Display.h"
-#include "Game.h"
 #include "Utilities.h"
-
-#include <string>
 
 namespace Triton
 {
@@ -15,10 +11,8 @@ namespace Triton
 	public:
 		//value checked by main loop
 		bool Quit;
-		//value is true if engine is running a game
-		bool inGame;
 
-		// pointer to current Game object that is running
+		// pointer to current Game object that is running, only one game can run at a time
 		Game* currentGame;
 
 		//constructor
@@ -27,10 +21,10 @@ namespace Triton
 		//function called by the main loop
 		void update();
 
-		//
+		// loads game from file
 		void loadGame(const char* GameFile);
 
-		//
+		// exits out of game, without deleting it from memory
 		void endGame();
 
 		//destructor
@@ -41,6 +35,8 @@ namespace Triton
 		Display m_display;
 		// event handler
 		SDL_Event m_event;
+		// value is true if engine is running a game
+		bool inGame;
 	};
 }
 	

@@ -11,10 +11,10 @@ Camera::Camera(bool orthographic, unsigned short screenWidth, unsigned short scr
 	LookDirection = Forward;
 	if (orthographic)
 		Projection = ortho(-screenWidth / 2.f, screenWidth / 2.f, -screenHeight / 2.f, 
-		screenHeight / 2.f, nearClippingDistance, farClippingDistance);
+			screenHeight / 2.f, nearClippingDistance, farClippingDistance);
 	else
 		Projection = perspective(field_of_view, screenWidth / (float)screenHeight, 
-		nearClippingDistance, farClippingDistance);
+			nearClippingDistance, farClippingDistance);
 
 	View = Projection * lookAt(Position, Position + LookDirection, Up);
 }
@@ -52,35 +52,43 @@ void Camera::setProjection(unsigned short screenWidth,
 	View = Projection * lookAt(Position, Position + LookDirection, Up);
 }
 
+// temporary just for testing later
 void Camera::input(SDL_Event& e)
 {
+	float frametime = 1 / 60.f;
+	
 	if (e.type == SDL_MOUSEBUTTONUP)
+	{
 		if (e.button.button == SDL_BUTTON_LEFT)
 			if (SDL_SetRelativeMouseMode(SDL_FALSE) < 0)
 				throw "Can't get out of relative mouse mode.";
-	else if (e.type == SDL_MOUSEBUTTONDOWN)
+	}
+	if (e.type == SDL_MOUSEBUTTONDOWN)
+	{
 		if (e.button.button == SDL_BUTTON_LEFT)
 			if (SDL_SetRelativeMouseMode(SDL_TRUE) < 0)
 				throw "Couldn't not set relative mouse mode.";
+	}
 	if (e.type == SDL_MOUSEMOTION)
 		if (SDL_GetRelativeMouseMode())
-			Rotate(atanf(e.motion.yrel / float(ViewWidth)), atanf(-e.motion.xrel / float(ViewHeight)), 0.f);
+			Rotate(atanf(e.motion.yrel / float (ViewWidth)), 
+				atanf(-e.motion.xrel / float (ViewHeight)), 0.f);
 	if (e.type == SDL_KEYDOWN)
 	{
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_w:
-			moveVector.z = 1 / 60.f; break;
+			moveVector.z = frametime; break;
 		case SDLK_s:
-			moveVector.z = -1 / 60.f; break;
+			moveVector.z = -frametime; break;
 		case SDLK_a:
-			moveVector.x = -1 / 60.f; break;
+			moveVector.x = -frametime; break;
 		case SDLK_d:
-			moveVector.x = 1 / 60.f; break;
+			moveVector.x = frametime; break;
 		case SDLK_SPACE:
-			moveVector.y = 1 / 60.f; break;
+			moveVector.y = frametime; break;
 		case SDLK_LSHIFT:
-			moveVector.y = -1 / 60.f; break;
+			moveVector.y = -frametime; break;
 		}
 	}
 	if (e.type == SDL_KEYUP)
@@ -91,38 +99,38 @@ void Camera::input(SDL_Event& e)
 		{
 		case SDLK_w:
 			if (keyStates[SDL_SCANCODE_S])
-				moveVector.z = -1 / 60.f;
+				moveVector.z = -frametime;
 			else
 				moveVector.z = 0.f;
 			break;
 		case SDLK_s:
 			if (keyStates[SDL_SCANCODE_W])
-				moveVector.z = 1 / 60.f;
+				moveVector.z = frametime;
 			else
 				moveVector.z = 0.f;
 
 			break;
 		case SDLK_a:
 			if (keyStates[SDL_SCANCODE_D])
-				moveVector.x = 1 / 60.f;
+				moveVector.x = frametime;
 			else
 				moveVector.x = 0.f;
 			break;
 		case SDLK_d:
 			if (keyStates[SDL_SCANCODE_A])
-				moveVector.x = -1 / 60.f;
+				moveVector.x = -frametime;
 			else
 				moveVector.x = 0.f;
 			break;
 		case SDLK_SPACE:
 			if (keyStates[SDL_SCANCODE_LSHIFT])
-				moveVector.y = -1 / 60.f;
+				moveVector.y = -frametime;
 			else
 				moveVector.y = 0.f;
 			break;
 		case SDLK_LSHIFT:
 			if (keyStates[SDL_SCANCODE_SPACE])
-				moveVector.y = 1 / 60.f;
+				moveVector.y = frametime;
 			else
 				moveVector.y = 0.f;
 			break;

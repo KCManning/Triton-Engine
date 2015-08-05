@@ -6,7 +6,9 @@
 #include "SDL2\SDL.h"
 #include "SDL2\SDL_image.h"
 #include "GL\glew.h"
-#include <string>
+#include <vector>
+
+using namespace std;
 
 namespace Triton
 {
@@ -17,14 +19,15 @@ namespace Triton
 	struct Texture
 	{
 		// array of pixel components for the texture
-		unsigned char* pixels;
-		bool error;
-		char* errorMessage;
+		vector<unsigned char> pixels;
 		// handle of the texture in openGL
 		GLuint handle;
 
-		// cosntructor: fills the pixels array and assigns the handle for the texture
-		Texture(const char* texturePath);
+		// default constructor
+		Texture() { handle = NULL; }
+		
+		// fills the pixels array and assigns the handle for the texture
+		void load(const char* texturePath);
 
 		// binds this texture to used for coloring the current mesh in memory
 		void bind();

@@ -9,7 +9,7 @@ Display::Display()
 	m_context = NULL;
 }
 
-void Display::init(unsigned int screenWidth, unsigned int screenHeight, const string& windowName)
+void Display::init(unsigned int screenWidth, unsigned int screenHeight, const char* windowName)
 {
 	// display needs sdl's video subsystem, checks if it was enabled, sdl_wasinit returns a Uint32
 	if (SDL_WasInit(SDL_INIT_VIDEO) != SDL_INIT_VIDEO)
@@ -33,11 +33,15 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const st
 
 	// checks if sdl encountered an error, by checking if SDL_GetError() returns an empty string
 	if (SDL_GetError()[0] != 0)
-		throw strcat("A GL Attribute failed to be set.", SDL_GetError());
+	{
+		string errorMsg = "A GL Attribute failed to be set.";
+		throw (errorMsg + SDL_GetError()).c_str();
+	}
+		
 
 	// creates a window that is able to be set with an openGL context
-	m_window = SDL_CreateWindow(windowName.c_str(), SDL_WINDOWPOS_UNDEFINED, 
-		SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	m_window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
+		screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
 	// checks if window was actually created
 	if (m_window == NULL)
@@ -82,7 +86,8 @@ void Display::clear()
 
 void Display::setFullScreen(Uint32 flag)
 {
-	SDL_SetWindowFullscreen(m_window, flag);
+	if(SDL_SetWindowFullscreen(m_window, flag) != 0)
+		throw "could not set fullscreen";
 }
 
 void Display::setWindowSize(unsigned int width, unsigned int height)
@@ -95,9 +100,9 @@ void Display::getWindowSize(int * width, int * height)
 	SDL_GetWindowSize(m_window, width, height);
 }
 
-void Display::setWindowName(string& windowName)
+void Display::setWindowName(const char* windowName)
 {
-	SDL_SetWindowTitle(m_window, windowName.c_str());
+	SDL_SetWindowTitle(m_window, windowName);
 }
 
 void Display::setClearColor(float r, float g, float b, float a)

@@ -5,10 +5,11 @@
 using namespace Triton;
 
 // declaration of static member variables
-list<Shader::ShaderComponent> Shader::Components;
+list<Shader::ShaderComponent*> Shader::Components;
 
-Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings, 
-	unsigned short comp_index)
+GLint Shader::active = NULL;
+
+Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings)
 {
 	handle = glCreateShader(shaderType);
 
@@ -29,18 +30,31 @@ Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings,
 	glCompileShader(handle);
 
 	// error checking to see if the shader compiled correctly
-	error = checkShaderError(handle, GL_COMPILE_STATUS, false, 
-		"Error: Shader Compilation Failed: ");
-
-	index = comp_index;
+	try{
+		checkShaderError(handle, GL_COMPILE_STATUS, false, "Error: Shader Compilation Failed: ");
+	}
+	catch (const char* errorMessage)
+	{
+		throw errorMessage;
+	}
+		
 }
 
 unsigned short Shader::createComponent(string& GLSLstrings, GLenum shaderType)
 {
+	ShaderComponent* component = new ShaderComponent(shaderType, GLSLstrings);
+	
 	// constructs shader component and adds it to the components list
-	Components.emplace_back(shaderType, GLSLstrings, Components.size());
+	Components.emplace_back(component);
 
 	return Components.size() - 1;
+}
+
+void Shader::clearComponents()
+{
+	for (list<ShaderComponent*>::iterator it = Components.begin(); it != Components.end(); ++it)
+		delete *it;
+	Components.clear();
 }
 
 void Shader::init(unsigned short components[])
@@ -50,22 +64,12 @@ void Shader::init(unsigned short components[])
 	unsigned short length = (sizeof(components) / sizeof(short));
 	for (unsigned short i = 0; i < length; ++i)
 	{
-		list<ShaderComponent>::iterator it;
-		bool startAtBegin = (components[i] < (Components.size()/2));
-		if (startAtBegin)
-		{
-			it = Components.begin();
-			for (unsigned short j = 1; j < components[i]; ++j)
-				++it;
-		}
-		else
-		{
-			it = Components.end();
-			for (unsigned short j = Components.size() - 2; j > components[i]; --j)
-				--it;
-		}
+		list<ShaderComponent*>::iterator it = Components.begin();
+		for (unsigned short j = 0; j < components[i]; ++j)
+			++it;
 			
-		glAttachShader(handle, (*it).handle);
+		glAttachShader(handle, (*it)->handle);
+		m_components.push_back(*it);
 	}
 
 	// binds the locations of these variables in the shader program to these attribute locations
@@ -77,18 +81,32 @@ void Shader::init(unsigned short components[])
 	glBindAttribLocation(handle, GROUPS, "groups");
 
 	glLinkProgram(handle);
-	error = checkShaderError(handle, GL_LINK_STATUS, true, "Error: Program Linking Failed: ");
+	try{
+		checkShaderError(handle, GL_LINK_STATUS, true, "Error: Program Linking Failed: ");
+	}
+	catch (const char* errorMessage)
+	{
+		throw errorMessage;
+	}
+
 
 	glValidateProgram(handle);
-	error = checkShaderError(handle, GL_VALIDATE_STATUS, true, "Error: Program is Invalid: ");
+	try{
+		checkShaderError(handle, GL_VALIDATE_STATUS, true, "Error: Program is Invalid: ");
+	}
+	catch (const char* errorMessage)
+	{
+		throw errorMessage;
+	}
 }
 
 void Shader::bind()
 {
 	glUseProgram(handle);
+	active = handle;
 }
 
-bool Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,
+void Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,
 	const string& errorMessage)
 {
 	GLint success = 0;
@@ -112,8 +130,6 @@ bool Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProg
 			glGetShaderInfoLog(shaderHandle, sizeof(error), NULL, error);
 
 		// prints errormessage to console
-		cerr << errorMessage << ": '" << error << "'" << endl;
+		throw (errorMessage + ": '" + error + "'").c_str();
 	}
-
-	return (success != GL_FALSE);
 }

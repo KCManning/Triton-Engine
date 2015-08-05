@@ -4,7 +4,7 @@
 using namespace Triton;
 using namespace std;
 
-Engine::Engine()
+Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 {
 	Uint32 startTime = SDL_GetTicks();
 
@@ -13,7 +13,6 @@ Engine::Engine()
 	
 	Quit = false;
 	inGame = false;
-	currentGame = nullptr;
 	
 	// SDL_Init returns a negative number on Error and records it in SDL_GetError
 	// for now we only need sdl for an fps counter, its opengl components, and event handling
@@ -28,18 +27,14 @@ Engine::Engine()
 
 void Engine::update()
 {
+	Uint32 frameStartTime = SDL_GetTicks();
+	
 	while (SDL_PollEvent(&m_event))
 	{
 		// checking if exit button was pressed
 		if (m_event.type == SDL_QUIT)
 			Quit = true;
-		if (m_event.type == SDL_KEYDOWN && (m_event.key.keysym.sym == SDLK_KP_ENTER || 
-			m_event.key.keysym.sym == SDLK_RETURN) && !inGame)
-		{
-			string path;
-			getline(cin, path);
-			loadGame(path.c_str());
-		}
+
 		// put all event handling here
 		if (inGame)
 			currentGame->input(m_event);
@@ -51,6 +46,13 @@ void Engine::update()
 	// swap buffers
 	m_display.update();
 
+	Uint32 frameTime = SDL_GetTicks() - frameStartTime;
+	
+	if (float(frameTime) < 1000.f / 60)
+	{
+		SDL_Delay(Uint32(1000.f / 60 - frameTime));
+	}
+	
 	// clear stuff on the buffer you are about to draw on
 	m_display.clear();
 }
@@ -58,41 +60,45 @@ void Engine::update()
 void Engine::loadGame(const char* GameFile)
 {
 	try{
-		currentGame = parseGameFile(GameFile);
-	}
-	catch (exception e)
-	{
-		cerr << "error occurred while reading file '" << GameFile << "' " << e.what() << endl;
+		Uint32 startOfLoadTime = SDL_GetTicks();
+		currentGame = new Game;
+		parse(GameFile, currentGame);
+		cout << "Game took " << SDL_GetTicks() - startOfLoadTime << " milliseconds to load" 
+			<< endl;
+		inGame = true;
 	}
 	catch (const char* errorMessage)
 	{
-		cerr << "error occurred while reading file " << errorMessage << endl;
+		cerr << "error occurred while loading game: " << errorMessage << endl;
+		delete currentGame;
 	}
 
-	if (currentGame)
+	// sets game window parameters
+	if (inGame)
 	{
 		if (currentGame->windowWidth)
 			m_display.setWindowSize(currentGame->windowWidth, currentGame->windowHeight);
-		m_display.setWindowName(currentGame->title);
+		m_display.setWindowName(currentGame->title.c_str());
 		if (currentGame->desktop_resolution)
-			m_display.setFullScreen(SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN);
+			m_display.setFullScreen(SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN | 
+				SDL_WINDOW_OPENGL);
 		else if (currentGame->fullscreen)
-			m_display.setFullScreen(SDL_WINDOW_FULLSCREEN);
-	}	
+			m_display.setFullScreen(SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+	}
 }
 
 void Engine::endGame()
 {
 	currentGame->quit();
+	inGame = false;
 }
 
 Engine::~Engine()
 {
-	if (currentGame != nullptr)
-	{
-		currentGame->quit();
-		delete currentGame;
-	}
-		
+	currentGame->quit();
+	delete currentGame;
+	currentGame = nullptr;
+	Shader::clearComponents();
+
 	SDL_Quit();
 }

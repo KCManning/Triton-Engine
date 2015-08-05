@@ -3,31 +3,26 @@
 
 using namespace Triton;
 
-Game::Game()
+Game::Game() : currentScene(nullptr)
 {
 	windowWidth, windowHeight = 0;
 	desktop_resolution, fullscreen = false;
-	currentScene = nullptr;
 }
 
 void Game::update()
 {
-
+	currentScene->update();
+	currentScene->draw();
 }
 
 void Game::input(SDL_Event &e)
 {
-
+	currentScene->input(e);
 }
 
 void Game::quit()
 {
-
-}
-
-Game::~Game()
-{
-	if (currentScene)
-		delete currentScene;
+	delete currentScene;
+	currentScene = nullptr;
 	sceneDirectories.clear();
 }

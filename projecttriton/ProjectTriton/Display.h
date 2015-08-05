@@ -25,8 +25,7 @@ namespace Triton
 		//screenWidth = width of the window display
 		//screenHeight = height of the window display
 		//windowName = title that shows up on the top bar of the window
-		void init(unsigned int screenWidth, unsigned int screenHeight,
-			const string& windowName);
+		void init(unsigned int screenWidth, unsigned int screenHeight, const char* windowName);
 
 		//swaps frame buffers each frame to update screen
 		void update();
@@ -49,7 +48,7 @@ namespace Triton
 		void getWindowSize(int * width, int * height);
 
 		// sets the title that shows on the top bar of the window
-		void setWindowName(string& windowName);
+		void setWindowName(const char* windowName);
 
 		// sets clear color
 		void setClearColor(float r, float g, float b, float a);
