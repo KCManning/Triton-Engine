@@ -17,6 +17,47 @@ using namespace std;
 const short vect2 = 2;
 const short vect3 = 3;
 
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 enum storageType
 {
 	typeMesh,

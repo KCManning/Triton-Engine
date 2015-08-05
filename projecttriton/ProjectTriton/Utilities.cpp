@@ -230,6 +230,48 @@ list<string> Triton::split(const string &data)
 	return output;
 }
 
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 // converts file in filepath specified and returns the strings of said file, removing linefeeds,
 // comments and other unnecessary lines from the file, either xml or script
 list<string> Triton::parseOutComments(const char* filepath)
@@ -312,6 +354,47 @@ list<string> Triton::parseOutComments(const char* filepath)
 	return tokens;
 }
 
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 // returns a map iterator so that position can be set later by scene file parser for the object
 unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const char* filepath, SceneLevel * scene)
 {
@@ -347,6 +430,47 @@ unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const ch
 }
 
 #pragma region Parsers
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 void Triton::parse(Mesh type, const char* filepath)
 {
 	string filePath = "../Models/";
@@ -643,9 +767,91 @@ void Triton::parse(Mesh type, const char* filepath)
 	dataFile.close();
 }
 
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 void Triton::parse(Armature type, const char* filepath)
 {}
 
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function’s purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 void Triton::parse(Game type, const char* filepath)
 {}
 #pragma endregion
