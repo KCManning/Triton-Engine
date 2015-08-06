@@ -23,7 +23,7 @@ namespace Triton
 		list<Material*> materials;
 		list<ObjectEntity*> objects;
 
-		Camera* camera;
+		Camera camera;
 
 		// properties *future feature once scripting is better implemented*
 

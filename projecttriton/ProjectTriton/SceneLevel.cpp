@@ -5,12 +5,13 @@ using namespace Triton;
 
 SceneLevel::SceneLevel()
 {
-	camera = nullptr;
+	// camera = nullptr;
 }
 
 void SceneLevel::update()
 {
-	camera->update();
+	// camera->update();
+	camera.update();
 
 	for (list<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
@@ -28,7 +29,8 @@ void SceneLevel::draw()
 
 void SceneLevel::input(SDL_Event& e)
 {
-	camera->input(e);
+	// camera->input(e);
+	camera.input(e);
 	
 	for (list<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
@@ -38,8 +40,8 @@ void SceneLevel::input(SDL_Event& e)
 
 SceneLevel::~SceneLevel()
 {
-	delete camera;
-	camera = nullptr;
+	// delete camera;
+	// camera = nullptr;
 
 	for (list<ObjectEntity*>::iterator it = objects.begin(); it != objects.end(); ++it)
 		delete *it;

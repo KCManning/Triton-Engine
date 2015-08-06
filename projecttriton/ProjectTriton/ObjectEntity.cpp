@@ -6,7 +6,7 @@ using namespace Triton;
 ObjectEntity::ObjectEntity()
 {
 	Mesh* mesh = nullptr;
-	Armature* armature = nullptr;
+	// Armature* armature = nullptr;
 	Material* material = nullptr;
 }
 
