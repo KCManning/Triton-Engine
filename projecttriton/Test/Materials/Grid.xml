@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<material id="Grid">
+	<!--diffuse type means only vertex and fragment shaders-->
+	<shader id="phong">
+		phong;
+	</shader>
+	<texture type="diffuse">
+		<!--id, filepath relative to game directory-->
+		UVGrid;
+	</texture>
+</material>

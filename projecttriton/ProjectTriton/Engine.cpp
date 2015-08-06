@@ -67,10 +67,11 @@ void Engine::loadGame(const char* GameFile)
 			<< endl;
 		inGame = true;
 	}
-	catch (const char* errorMessage)
+	catch (const string& errorMessage)
 	{
 		cerr << "error occurred while loading game: " << errorMessage << endl;
 		delete currentGame;
+		currentGame = nullptr;
 	}
 
 	// sets game window parameters
@@ -95,7 +96,8 @@ void Engine::endGame()
 
 Engine::~Engine()
 {
-	currentGame->quit();
+	if (currentGame != nullptr)
+		currentGame->quit();
 	delete currentGame;
 	currentGame = nullptr;
 	Shader::clearComponents();

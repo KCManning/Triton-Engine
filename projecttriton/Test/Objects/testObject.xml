@@ -3,14 +3,16 @@
 	<mesh>
 		Cube;
 	</mesh>
+	<!--
 	<armature>
 		Armature;
 	</armature>
 	<idle_anim>
 		Pose;
 	</idle_anim>
+	-->
 	<material>
-		Grid;
+		Grid
 	</material>
 	<!--
 	--not yet implemented

@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene id="Test Scene">
-	<assets>
-		"Models/bend.xml";
-	</assets>
-	<!--object attribute should always be after assets-->
+	<meshes directory = "Models/">
+		"cube.xml";
+	</meshes>
+	<textures directory = "Textures/">
+		"UVGrid.png", UVGrid;
+	</textures>
+	<shaders directory = "Shaders/">
+		"phong.xml";
+	</shaders>
+	<!--always put materials after shaders and textures-->
+	<materials directory = "Materials/">
+		"Grid.xml";
+	</materials>
+	<!--object attribute should always be after assets(meshes, textures... etc.)-->
 	<objects directory="Objects/">
 		<!--if directory is in attribute declaration it is concatenated with any path in the game directory-->
 		<!--sub-attribute directories will be concatenated with attribute directories and game directory-->

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shader id = "phong">
+	<directory>
+		"Shaders/"
+	</directory>
+	<!--Shader Component type, id, filepath relative to game directory-->
+	<component type="vertex">
+		"phongVertex.glsl";
+	</component>
+	<component type="fragment">
+		"phongFragment.glsl";
+	</component>
+</shader>

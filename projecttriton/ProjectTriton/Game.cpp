@@ -3,8 +3,9 @@
 
 using namespace Triton;
 
-Game::Game() : currentScene(nullptr)
+Game::Game()
 {
+	currentScene = nullptr;
 	windowWidth, windowHeight = 0;
 	desktop_resolution, fullscreen = false;
 }

@@ -3,8 +3,9 @@
 
 using namespace Triton;
 
-SceneLevel::SceneLevel() : camera(nullptr)
+SceneLevel::SceneLevel()
 {
+	camera = nullptr;
 }
 
 void SceneLevel::update()
@@ -38,6 +39,7 @@ void SceneLevel::input(SDL_Event& e)
 SceneLevel::~SceneLevel()
 {
 	delete camera;
+	camera = nullptr;
 
 	for (list<ObjectEntity*>::iterator it = objects.begin(); it != objects.end(); ++it)
 		delete *it;

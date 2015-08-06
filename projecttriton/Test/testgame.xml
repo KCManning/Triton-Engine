@@ -11,7 +11,7 @@
 			true, false; sets window to full screen at specified resolution
 			true, true; sets window to full screen at desktop resolution, overwrites resolution attribute
 		-->
-			true, true;
+			false, false;
 		</fullscreen>
 		<title>
 			"Test";

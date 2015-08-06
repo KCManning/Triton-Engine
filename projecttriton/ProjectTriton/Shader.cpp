@@ -33,7 +33,7 @@ Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings)
 	try{
 		checkShaderError(handle, GL_COMPILE_STATUS, false, "Error: Shader Compilation Failed: ");
 	}
-	catch (const char* errorMessage)
+	catch (const string& errorMessage)
 	{
 		throw errorMessage;
 	}
@@ -72,13 +72,7 @@ void Shader::init(unsigned short components[])
 		m_components.push_back(*it);
 	}
 
-	// binds the locations of these variables in the shader program to these attribute locations
-	glBindAttribLocation(handle, VERTEX, "vertex");
-	glBindAttribLocation(handle, UV, "UV");
-	glBindAttribLocation(handle, NORMAL, "normal");
-	glBindAttribLocation(handle, TANGENT, "tangent");
-	glBindAttribLocation(handle, WEIGHTS, "weights");
-	glBindAttribLocation(handle, GROUPS, "groups");
+	// what was here is now further down
 
 	glLinkProgram(handle);
 	try{
@@ -98,12 +92,27 @@ void Shader::init(unsigned short components[])
 	{
 		throw errorMessage;
 	}
+
+	// ^^^this was up there^^^
+
+	// binds the locations of these variables in the shader program to these attribute locations
+	glBindAttribLocation(handle, VERTEX, "vertex");
+	glBindAttribLocation(handle, UV, "UV");
+	glBindAttribLocation(handle, NORMAL, "normal");
+	glBindAttribLocation(handle, TANGENT, "tangent");
+	glBindAttribLocation(handle, WEIGHTS, "weights");
+	glBindAttribLocation(handle, GROUPS, "groups");
 }
 
 void Shader::bind()
 {
 	glUseProgram(handle);
 	active = handle;
+}
+
+Shader::~Shader()
+{
+	m_components.clear();
 }
 
 void Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,
@@ -130,6 +139,6 @@ void Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProg
 			glGetShaderInfoLog(shaderHandle, sizeof(error), NULL, error);
 
 		// prints errormessage to console
-		throw (errorMessage + ": '" + error + "'").c_str();
+		throw (errorMessage + ": '" + error + "'");
 	}
 }

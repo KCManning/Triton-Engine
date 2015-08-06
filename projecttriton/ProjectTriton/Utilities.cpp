@@ -1,156 +1,33 @@
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	File: [File Name]
 //
 //	Functions:
 //	[Functions Used]
 //
-//---------------------------------------------------------------------
-
+//-------------------------------------------------------------------------------------------------
 #include "Utilities.h"
 
 using namespace Triton;
 
+string Parser::currentGameDirectory = "";
 
-Game* Triton::parseGameFile(const char* filepath)
-{
-	list<string> tokens = parseOutComments(filepath);
+SceneLevel* Parser::m_nullScene = nullptr;
 
-	// pops out the game tokens(<game> and </game> from the list)
-	tokens.pop_back();
-	tokens.pop_front();
+SceneLevel*& Parser::currentScene = Parser::m_nullScene;
 
-	// creates a new game object
-	Game* game = new Game;
+unordered_map<string, Mesh*> Parser::meshMap;
+unordered_map<string, ObjectEntity*> Parser::objectMap;
+unordered_map<string, Material*> Parser::materialMap;
+unordered_map<string, Texture*> Parser::textureMap;
+unordered_map<string, Shader*> Parser::shaderMap;
 
-	for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
-	{
-		if (*it == "directory")
-			game->directory = *(++it);
-		else if (*it == "window")
-			while (*(++it) != "/window")
-			{
-				if (*it == "fullscreen")
-				{
-					game->fullscreen = (stoi(*(++it)) != 0);
-					if (game->fullscreen)
-						game->desktop_resolution = (stoi(*(++it)) != 0);
-					else
-						game->desktop_resolution = false;
-				}
-				else if (*it == "resolution")
-				{
-					game->windowWidth = stoi(*(++it));
-					game->windowHeight = stoi(*(++it));
-				}
-				else if (*it == "title")
-					game->title = *(++it);
-			}
-		else if (*it == "scenes")
-		{
-			string sceneDirectory = game->directory;
-			while (*(++it) != "/scenes")
-			{
-				if (*it == "directory")
-					sceneDirectory.append(*(++it));
-				else
-				{
-					const string sceneID = *it;
-					const string sceneFile = *(++it);
-					game->sceneDirectories.emplace(sceneID, sceneFile);
-					if (!(game->currentScene))
-					{
-						try{
-							parseSceneFile(sceneDirectory.append(sceneFile).c_str(), game);
-						}
-						catch (exception e)
-						{
-							string errorMessage;
-							throw errorMessage.append(sceneFile.c_str()).append(" ").append(e.what()).c_str();
-						}
-					} // end of if (!(game->currentScene))
-				} // end of else
-			} // end of while
-		} // end of else if (*it == "scenes")
-	} // end of for
-
-	tokens.clear();
-
-	return game;
-}
-
-// loads in assets and object specified by scene file for the currentScene
-void Triton::parseSceneFile(const char* filepath, Game * game)
-{
-	list<string> tokens = parseOutComments(filepath);
-
-	// pops out border tokens
-	tokens.pop_back();
-	tokens.pop_front();
-
-	game->currentScene = new SceneLevel();
-
-	for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
-	{
-		if (*it == "id")
-			game->currentSceneID = *(++it);
-		else if (*it == "assets")
-		{
-			string assetDirectory = game->directory;
-
-			while (*(++it) != "/assets")
-			{
-				if (*it == "directory")
-					assetDirectory.append((*(++it)).c_str());
-				else
-				{
-					//*** // KM's parser will be used here, 
-					// assetDirectory.append((*it).c_str()).c_str() should be the filepath to bend.xml
-				}
-			}
-		}
-		// assets should have been already filled by this point
-		else if (*it == "objects")
-		{
-			string objectDirectory = game->directory;
-
-			while (*(++it) != "/objects")
-			{
-				if (*it == "directory")
-					objectDirectory.append((*(++it)).c_str());
-				else if (*it == "object")
-				{
-					// iterator in the objects map to this object currently being parsed
-					unordered_map<string, ObjectEntity *>::iterator objIterator;
-
-					while (*(++it) != "/object")
-					{
-						if (*it == "file")
-							objIterator = parseObjectFile(objectDirectory.append(
-							(*(++it)).c_str()).c_str(), game->currentScene);
-						else if (*it == "position")
-						{
-							float x, y, z;
-							x = stof(*(++it));
-							y = stof(*(++it));
-							z = stof(*(++it));
-
-							objIterator->second->position = vec3(x, y, z);
-						}
-					} // end while
-				} // end else if
-			} // end while
-		} // end else if
-	} // end for
-
-	tokens.clear();
-}
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
 //
 //	Description: 
-//	[Description of Function’s purpose]
+//	[Description of Function's purpose]
 //
 //	Programmer(s):
 //	[Names involved in creation of this Function]
@@ -185,258 +62,220 @@ void Triton::parseSceneFile(const char* filepath, Game * game)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //---------------------------------------------------------------------
-// KM's parser's split function with reworded nomenclature
+list<string> Triton::getTokensFromFile(const char* filepath)
+{
+	try{
+		ifstream file;
+		file.open(filepath, ifstream::in);
+
+		string line;
+		list<string> tokens;
+		while (file.good())
+		{	
+			getline(file, line);
+
+			if (line.empty())
+				continue;
+
+			// removes indents from the file strings
+			while ((line.front() == '\t') || (line.front() == ' '))
+				line = line.substr(1);
+			// for the first line in an xml file, the header, which is really superficial for this 
+			// engine and is only there for xml editors, such as notepad++
+			if (!strncmp(line.c_str(), "<?", 2))
+			{
+				// checks if the header ends before the first linefeed
+				size_t pos = line.rfind('>');
+				// if it doesn't, it looks for the end of the header ignoring all characters
+				if (pos == line.npos)
+					file.ignore(USHRT_MAX, '>');
+				// if it does end before the first linefeed, checks if there's any other content on
+				// the first line before the first linefeed other than the header
+				else if (pos + 1 < line.size())
+					// moves the ifstream to the character right after the header, if there's 
+					// more than just the header in the first line
+					file.seekg(pos + 1 - line.size(), file.cur);
+			}
+			// checks for xml comments
+			else if (!strncmp(line.c_str(), "<!--", 4))
+			{
+				// checks if the end of the comment is in this line of the file or if it's a block
+				size_t pos = line.rfind("-->");
+				// if it's a block comment the program searches for the end of the commment block
+				while (pos == line.npos && file.good())
+				{
+					// searches for the next occurrence of the '>' character
+					getline(file, line, '>');
+					line.push_back('>');
+					// checks if it's the end comment token
+					pos = line.rfind("-->", line.size() - 3);
+				}
+				// checks if the comment is the only content in this line of the file
+				if (pos != line.npos && pos + 3 < line.size())
+					// sets the ifstream position right after the end comment token
+					file.seekg(pos + 3 - line.size(), file.cur);
+			}
+			// checks for c++ style comments
+			else if (!strncmp(line.c_str(), "//", 2))
+				// program just throws away the line since the end token for this type of comment
+				//  is a line feed, which is the default delimiter for getline
+				;
+			// checks for c++ style block comments
+			else if (!strncmp(line.c_str(), "/*", 2))
+			{
+				size_t pos = line.rfind("*/");
+				while (pos == line.npos && file.good())
+				{
+					// searches for the next occurrence of the '/' character
+					getline(file, line, '/');
+					line.push_back('/');
+					// checks if it's the end block comment token
+					pos = line.rfind("*/", line.size() - 2);
+				}
+				// checks if the comment is the only content in this line of the file
+				if (pos != line.npos && pos + 2 < line.size())
+					// sets the ifstream position right after the end comment token
+					file.seekg(pos + 2 - line.size(), file.cur);
+			}
+			else
+				// appends each line that's not a comment or header to the token list
+				tokens.splice(tokens.cend(), split(line));
+		}
+
+		file.close();
+
+		if (tokens.empty())
+		{
+			const string error = "file failed to create tokens.";
+			throw error;
+		}
+			
+		// removes border tokens
+		tokens.pop_back();
+		tokens.pop_front();
+
+		return tokens;
+	}
+	catch (const exception& e)
+	{
+		string errorMsg = e.what();
+		throw (errorMsg + " occured while reading file " + filepath);
+	}
+	catch (const string& error)
+	{
+		string errorMsg = error;
+		throw (errorMsg + " while reading file " + filepath);
+	}
+}
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function's purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
 list<string> Triton::split(const string &data)
 {
-	string token;
+	try{
+		string token;
 
-	list<string> output;
+		list<string> output;
 
-	for (string::const_iterator it = data.cbegin(); it != data.cend(); ++it)
-	{
-		switch (*it)
+		for (string::const_iterator it = data.cbegin(); it != data.cend(); ++it)
 		{
-		case '"':
-			while (*(++it) != '"')
-				token.push_back(*it);
-			// token needs to be pushed back even if it's empty in this case
-			output.push_back(token);
-			token.clear();
-			break;
-		case '\t':
-			break;
-		case '<': case '>': case '=': case '/': case ' ': case ',': case ';': case '\'':
-			if (token != "")
+			switch (*it)
 			{
-				if (token == "true")
-					output.push_back("1");
-				else if (token == "false")
-					output.push_back("0");
-				else
-					output.push_back(token);
+			case '"':
+				while (*(++it) != '"')
+				{
+					if (it != --data.cend())
+						token.push_back(*it);
+					else
+						throw out_of_range("no ending \" after a \"");
+				}
+				// token needs to be pushed back even if it's empty in this case
+				output.push_back(token);
 				token.clear();
+				break;
+			case '<': case '>': case '=': case '/': case ' ': case ',': case ';': case '\'':
+				if (token != "")
+				{
+					if (token == "true")
+						output.push_back("1");
+					else if (token == "false")
+						output.push_back("0");
+					else
+						output.push_back(token);
+					token.clear();
+				}
+				if (*it == '<')
+					if (*(++it) == '/')
+						token.push_back(*it);
+					else
+						--it;
+				break;
+			default:
+				token.push_back(*it);
 			}
-			if (*it == '<')
-				if (*(++it) == '/')
-					token.push_back(*it);
-				else
-					--it;
-			break;
-		default:
-			token.push_back(*it);
 		}
+
+		return output;
 	}
-
-	return output;
-}
-
-
-//---------------------------------------------------------------------
-//	Function: [Name of this Function]
-//
-//	Title: main program
-//
-//	Description: 
-//	[Description of Function’s purpose]
-//
-//	Programmer(s):
-//	[Names involved in creation of this Function]
-//
-//	Date: [Date Function was started]
-//
-//	Version: [Version of Function. Release is always 1.0]
-//
-//	Testing Environment: 
-//		Hardware: [Type of Machine code was tested on]
-//
-//		Software: [Operating System it was written on]
-//		[Name of software Function was written on]
-//
-//	Input: [Input Types]
-//
-//	Output: [Output Types]
-//
-//	Parameters:
-//	[Parameters of the Functions]
-// 
-//
-//	Returns:
-//	[Expected returns and causes]
-// 
-// 
-//	Called By: [Other Functions calling this one]
-// 
-//	Calls: [Other functions called by this one]
-//
-//	History Log: 
-//	[Initials, date, and succinct list of changes to the Function]
-// 
-//---------------------------------------------------------------------
-// converts file in filepath specified and returns the strings of said file, removing linefeeds,
-// comments and other unnecessary lines from the file, either xml or script
-list<string> Triton::parseOutComments(const char* filepath)
-{
-	ifstream file;
-	file.open(filepath, ifstream::in);
-
-	string line;
-	list<string> tokens;
-	while (file.good())
+	catch (const exception& e)
 	{
-		getline(file, line);
-		// removes indents from the file strings
-		while (!strncmp(line.c_str(), "\t", 1) || !strncmp(line.c_str(), " ", 1))
-			line = line.substr(1);
-		// for the first line in an xml file, the header, which is really superficial for this 
-		// engine and is only there for xml editors, such as notepad++
-		if (!strncmp(line.c_str(), "<?", 2))
-		{
-			// checks if the header ends before the first linefeed
-			size_t pos = line.rfind('>');
-			// if it doesn't, it looks for the end of the header ignoring all character before it
-			if (pos == line.npos)
-				file.ignore(USHRT_MAX, '>');
-			// if it does end before the first linefeed, checks if there's any other content on 
-			// the first line before the first linefeed other than the header
-			else if (pos + 1 < line.size())
-				// moves the ifstream to the character right after the header, if there's 
-				// more than just the header in the first line
-				file.seekg(pos + 1 - line.size(), file.cur);
-		}
-		// checks for xml comments
-		else if (!strncmp(line.c_str(), "<!--", 4))
-		{
-			// checks if the end of the comment is in this line of the file or if it's a block
-			size_t pos = line.rfind("-->");
-			// if it's a block comment the program searches for the end of the commment block
-			while (pos == line.npos && file.good())
-			{
-				// searches for the next occurrence of the '>' character
-				getline(file, line, '>');
-				line.push_back('>');
-				// checks if it's the end comment token
-				pos = line.rfind("-->", line.size() - 3);
-			}
-			// checks if the comment is the only content in this line of the file
-			if (pos != line.npos && pos + 3 < line.size())
-				// sets the ifstream position right after the end comment token
-				file.seekg(pos + 3 - line.size(), file.cur);
-		}
-		// checks for c++ style comments
-		else if (!strncmp(line.c_str(), "//", 2))
-			// program just throws away the line since the end token for this type of comment is a
-			// line feed, which is the default delimiter for getline
-			;
-		// checks for c++ style block comments
-		else if (!strncmp(line.c_str(), "/*", 2))
-		{
-			size_t pos = line.rfind("*/");
-			while (pos == line.npos && file.good())
-			{
-				// searches for the next occurrence of the '/' character
-				getline(file, line, '/');
-				line.push_back('/');
-				// checks if it's the end block comment token
-				pos = line.rfind("*/", line.size() - 2);
-			}
-			// checks if the comment is the only content in this line of the file
-			if (pos != line.npos && pos + 2 < line.size())
-				// sets the ifstream position right after the end comment token
-				file.seekg(pos + 2 - line.size(), file.cur);
-		}
-		else
-			// appends each line that's not a comment or header to the token list
-			tokens.splice(tokens.cend(), split(line));
+		string errorMsg = e.what();
+		throw (errorMsg + " occured while reading line " + data);
 	}
-
-	file.close();
-
-	return tokens;
-}
-
-//---------------------------------------------------------------------
-//	Function: [Name of this Function]
-//
-//	Title: main program
-//
-//	Description: 
-//	[Description of Function’s purpose]
-//
-//	Programmer(s):
-//	[Names involved in creation of this Function]
-//
-//	Date: [Date Function was started]
-//
-//	Version: [Version of Function. Release is always 1.0]
-//
-//	Testing Environment: 
-//		Hardware: [Type of Machine code was tested on]
-//
-//		Software: [Operating System it was written on]
-//		[Name of software Function was written on]
-//
-//	Input: [Input Types]
-//
-//	Output: [Output Types]
-//
-//	Parameters:
-//	[Parameters of the Functions]
-// 
-//
-//	Returns:
-//	[Expected returns and causes]
-// 
-// 
-//	Called By: [Other Functions calling this one]
-// 
-//	Calls: [Other functions called by this one]
-//
-//	History Log: 
-//	[Initials, date, and succinct list of changes to the Function]
-// 
-//---------------------------------------------------------------------
-// returns a map iterator so that position can be set later by scene file parser for the object
-unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const char* filepath, SceneLevel * scene)
-{
-	list<string> tokens = parseOutComments(filepath);
-
-	// pops out border tokens
-	tokens.pop_back();
-	tokens.pop_front();
-
-	string id;
-	ObjectEntity * object = new ObjectEntity();
-
-	for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+	catch (const string& errorMessage)
 	{
-		if (*it == "id")
-			id = *(++it);
-		else if (*it == "mesh")
-			object->mesh = scene->meshes.find(*(++it));
-		else if (*it == "armature")
-		{
-			object->armatureID = scene->armatures.find(*(++it));
-			object->armature = *(object->armatureID->second);
-		}
-		else if (*it == "idle_anim")
-			object->armature.setCurrentAnimation(*(++it));
-		else if (*it == "material")
-			object->material = scene->materials.find(*(++it));
+		throw errorMessage;
 	}
-
-	tokens.clear();
-
-	return scene->objects.emplace(id, object).first;
 }
 
 #pragma region Parsers
+
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
 //
 //	Description: 
-//	[Description of Function’s purpose]
+//	[Description of Function's purpose]
 //
 //	Programmer(s):
 //	[Names involved in creation of this Function]
@@ -471,300 +310,100 @@ unordered_map<string, ObjectEntity *>::iterator Triton::parseObjectFile(const ch
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //---------------------------------------------------------------------
-void Triton::parse(Mesh type, const char* filepath)
+void Triton::parse(const char* filepath, Game*& type)
 {
-	string filePath = "../Models/";
-	string sFileName = "bend.xml";
-	string wholeLine;
-	ifstream dataFile;
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
 
-
-	string m_FileName = filePath + sFileName;
-
-	vector<vec3> m_positions;
-	vector<vec2> m_texCoords;
-	vector<vec3> m_normals;
-	unsigned int** m_Faces;
-	unsigned int* m_FacesIndex;
-	mat4 m_Matrix;
-
-	dataFile.open(filepath);
-
-	int testTracking = 0;
-
-	while (getline(dataFile, wholeLine))
-	{
-		testTracking++;
-		list<string> parts = split(wholeLine);
-
-		string sType = parts.front();
-#pragma region Matrix
-		if (!strcmp(sType.c_str(), "matrix"))
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
-			if (parts.size() > 2)
+			if (*it == "directory")
 			{
-				parts.pop_front();
-				parts.pop_front();
+				type->directory = *(++it);
+				Parser::currentGameDirectory = type->directory;
 			}
-
-			sType = parts.front();
-
-			if (!strcmp(sType.c_str(), "Space"))
+			else if (*it == "window")
 			{
-				getline(dataFile, wholeLine);
-
-				for (int i = 0; i < 4; i++)
+				while (*(++it) != "/window")
 				{
-					getline(dataFile, wholeLine);
-					list<string> matrices = split(wholeLine);
-
-					for (int j = 0; j < 4; j++)
+					if (*it == "fullscreen")
 					{
-						float x = stof(matrices.front());
-						matrices.pop_front();
-						
-						m_Matrix[i][j] = x;
+						type->fullscreen = (stoi(*(++it)) != 0);
+						if (type->fullscreen)
+							type->desktop_resolution = (stoi(*(++it)) != 0);
+						else
+							type->desktop_resolution = false;
 					}
-				}
-
-			}
-		}
-#pragma endregion
-
-#pragma region Vertices
-		else if (!strcmp(sType.c_str(), "vertices"))
-		{
-			parts.pop_front();
-			parts.pop_front();
-
-			int count = stoi(parts.front());
-
-			for (int i = 0; i < count; i++)
-			{
-				getline(dataFile, wholeLine);
-				list<string> vertices = split(wholeLine);
-
-				float x = stof(vertices.front());
-				vertices.pop_front();
-				float y = stof(vertices.front());
-				vertices.pop_front();
-				float z = stof(vertices.front());
-				vertices.pop_front();
-
-				vec3 vert(x, y, z);
-				type.vertices.push_back(vert);
-				//m_positions.push_back(vert); //Vertices
-
-			}//end for
-
-			getline(dataFile, wholeLine);
-		}
-#pragma endregion
-
-#pragma region UVs
-		else if (!strcmp(sType.c_str(), "UVs"))
-		{
-			parts.pop_front();
-			parts.pop_front();
-
-			int count = stoi(parts.front());
-
-			for (int i = 0; i < count; i++)
-			{
-				getline(dataFile, wholeLine);
-				list<string> vertices = split(wholeLine);
-
-				float x = stof(vertices.front());
-				vertices.pop_front();
-				float y = stof(vertices.front());
-				vertices.pop_front();
-
-				vec2 uvs(x, y);
-				type.UVs.push_back(uvs); // UVs
-
-			}//end for
-
-			getline(dataFile, wholeLine);
-
-		}
-#pragma endregion
-
-#pragma region Normals
-		else if (!strcmp(sType.c_str(), "normals"))
-		{
-			parts.pop_front();
-			parts.pop_front();
-
-			int count = stoi(parts.front());
-
-			for (int i = 0; i < count; i++)
-			{
-				getline(dataFile, wholeLine);
-				list<string> normals = split(wholeLine);
-
-				float x = stof(normals.front());
-				normals.pop_front();
-				float y = stof(normals.front());
-				normals.pop_front();
-				float z = stof(normals.front());
-
-				vec3 norms(x, y, z);
-				type.normals.push_back(norms); // normals
-
-			}//end for
-
-			getline(dataFile, wholeLine);
-
-		}
-#pragma endregion
-
-#pragma region Faces
-		else if (!strcmp(sType.c_str(), "faces"))
-		{
-			parts.pop_front();
-			parts.pop_front();
-
-			const unsigned int count = stoul(parts.front()) * 3;
-
-			m_Faces = new unsigned int*[count];
-			m_FacesIndex = new unsigned int[count];
-
-
-			getline(dataFile, wholeLine);
-			unsigned int notUnique = 0;
-
-			for (unsigned int i = 0; i < count; i++)
-			{
-				getline(dataFile, wholeLine);
-
-				m_Faces[i] = new unsigned int[5];
-
-				list<string> face = split(wholeLine);
-				string sNum;
-				unsigned int v = 0;
-				unsigned int w = 0;
-				unsigned int x = 0;
-				unsigned int y = 0;
-				unsigned int z = 0;
-
-				sNum = face.front();
-
-				if (strcmp(sNum.c_str(), "na"))
-					v = stoi(sNum);
-
-				face.pop_front();
-				sNum = face.front();
-
-				if (strcmp(sNum.c_str(), "na"))
-					w = stoi(sNum);
-
-				face.pop_front();
-				sNum = face.front();
-
-				if (strcmp(sNum.c_str(), "na"))
-					x = stoi(sNum);
-
-				face.pop_front();
-				sNum = face.front();
-
-				if (strcmp(sNum.c_str(), "na"))
-					y = stoi(sNum);
-
-				face.pop_front();
-				sNum = face.front();
-
-				if (strcmp(sNum.c_str(), "na"))
-					z = stoi(sNum);
-
-				face.pop_front();
-
-				m_Faces[i][0] = v;
-				m_Faces[i][1] = w;
-				m_Faces[i][2] = x;
-				m_Faces[i][3] = y;
-				m_Faces[i][4] = z;
-
-				
-				bool booUnique = true;
-
-				for (int j = 0; j < i; j++)
-				{
-					booUnique = true;
-
-					for (int k = 0; k < 5; k++)
+					else if (*it == "resolution")
 					{
-						if (m_Faces[j][k] != m_Faces[i][k])
+						type->windowWidth = stoi(*(++it));
+						type->windowHeight = stoi(*(++it));
+					}
+					else if (*it == "title")
+						type->title = *(++it);
+				}
+			}
+			else if (*it == "scenes")
+			{
+				string sceneDirectory = type->directory;
+				bool directorySaved = false;
+				while (*(++it) != "/scenes")
+				{
+					if (*it != "directory" || directorySaved)
+					{
+						const string sceneID = *it;
+						const string sceneFile = *(++it);
+						type->sceneDirectories.emplace(sceneID, sceneFile);
+						if (!type->currentScene)
 						{
-							break;
-						}
-						else if (k == 4)
-						{
-							m_FacesIndex[i] = j;
-							booUnique = false;
-							notUnique++;
-						}
-
-					}//end k
-
-					if (!booUnique)
-						break;
-
+							parse((sceneDirectory + sceneFile).c_str(), type->currentScene);
+						} // end of if (!(game->currentScene))
+					}
 					else
 					{
-
-						m_FacesIndex[i] = j - notUnique;
+						sceneDirectory.append(*(++it));
+						directorySaved = true;
 					}
+				} // end of while
+			} // end of else if (*it == "scenes")
+		} // end of for
 
+		tokens.clear();
 
-
-				}//end j
-
-
-			}//end i
-
-
-
-#pragma region Hastable attempts
-			/*unordered_map<string, unsigned int> hashFaces(count);
-			unsigned int j = 0;
-
-			getline(dataFile, wholeLine);
-
-			for (unsigned int i = 0; i < count; i++)
-			{
-			getline(dataFile, wholeLine);
-
-			unordered_map<string, unsigned int>::const_iterator got = hashFaces.find(wholeLine);
-
-			if (got == hashFaces.end())
-			{
-			pair<string, unsigned int> pairedFace(wholeLine, j);
-			hashFaces.insert(pairedFace);
-			j++;
-			}
-			else
-			{
-			pair<string, unsigned int> pairedFace(wholeLine, 0);
-			hashFaces.insert(pairedFace);
-			}
-			}*/
+		Parser::currentGameDirectory.clear();
+		Parser::meshMap.clear();
+		Parser::objectMap.clear();
+		Parser::materialMap.clear();
+		Parser::textureMap.clear();
+		Parser::shaderMap.clear();
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		Parser::currentGameDirectory.clear();
+		Parser::meshMap.clear();
+		Parser::objectMap.clear();
+		Parser::materialMap.clear();
+		Parser::textureMap.clear();
+		Parser::shaderMap.clear();
+		string errorMsg = " occurred while reading file '";
+		delete type;
+		type = nullptr;
+		throw (errorMsg + filepath + "' " + e.what());
+	}
+	catch (const string& errorMessage)
+	{
+		Parser::currentGameDirectory.clear();
+		Parser::meshMap.clear();
+		Parser::objectMap.clear();
+		Parser::materialMap.clear();
+		Parser::textureMap.clear();
+		Parser::shaderMap.clear();
+		delete type;
+		type = nullptr;
+		throw errorMessage;
+	}
 #pragma endregion
-
-			for (int i = 0; i < count; i++)
-			{
-				cout << m_Faces[i][0] << ", " << m_Faces[i][1] << ", " << m_Faces[i][2] << ", " << m_Faces[i][3] << ", "
-					<< m_Faces[i][4] << endl;
-				cout << "Index: " << m_FacesIndex[i] << endl;
-			}
-			getline(dataFile, wholeLine);//Deletes the </faces> line
-
-		}//end if
-#pragma endregion
-
-	}// end loop
-
-
-	dataFile.close();
 }
 
 //---------------------------------------------------------------------
@@ -773,7 +412,7 @@ void Triton::parse(Mesh type, const char* filepath)
 //	Title: main program
 //
 //	Description: 
-//	[Description of Function’s purpose]
+//	[Description of Function's purpose]
 //
 //	Programmer(s):
 //	[Names involved in creation of this Function]
@@ -808,8 +447,156 @@ void Triton::parse(Mesh type, const char* filepath)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //---------------------------------------------------------------------
-void Triton::parse(Armature type, const char* filepath)
-{}
+void Triton::parse(const char* filepath, SceneLevel*& type)
+{
+	bool sdl_image_running = false;
+	
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new SceneLevel;
+
+		Parser::currentScene = type;
+
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+#pragma region Meshes
+			if (*it == "meshes")
+			{
+				string meshDirectory = Parser::currentGameDirectory;
+
+				while (*(++it) != "/meshes")
+				{
+					if (*it != "directory")
+					{
+						Parser::currentScene->meshes.emplace_back(nullptr);
+						
+						parse((meshDirectory + *it).c_str(), Parser::currentScene->meshes.back());
+					}
+					else
+						meshDirectory.append((*(++it)).c_str());
+				}
+			}
+#pragma endregion
+
+#pragma region Materials
+			else if (*it == "materials")
+			{
+				string materialDirectory = Parser::currentGameDirectory;
+				
+				while (*(++it) != "/materials")
+				{
+					if (*it != "directory")
+					{
+						Parser::currentScene->materials.emplace_back(nullptr);
+
+						parse((materialDirectory + *it).c_str(), Parser::currentScene->materials.back());
+					}
+					else
+						materialDirectory.append((*(++it)).c_str());
+				}
+			}
+#pragma endregion
+
+#pragma region Textures
+			else if (*it == "textures")
+			{
+				IMG_Init(IMG_INIT_PNG);
+				sdl_image_running = true;
+
+				string textureDirectory = Parser::currentGameDirectory;
+
+				while (*(++it) != "/textures")
+				{
+					if (*it != "directory")
+					{
+						Parser::currentScene->textures.emplace_back(nullptr);
+
+						parse((textureDirectory + *it).c_str(), Parser::currentScene->textures.back());
+						Parser::textureMap.emplace(*(++it), Parser::currentScene->textures.back());
+					}
+					else
+						textureDirectory.append((*(++it)).c_str());
+				}
+
+				IMG_Quit();
+				sdl_image_running = false;
+			}
+#pragma endregion
+
+#pragma region Shaders
+			else if (*it == "shaders")
+			{
+				string shaderDirectory = Parser::currentGameDirectory;
+
+				while (*(++it) != "/shaders")
+				{
+					if (*it != "directory")
+					{
+						Parser::currentScene->shaders.emplace_back(nullptr);
+
+						parse((shaderDirectory + *it).c_str(), Parser::currentScene->shaders.back());
+					}
+					else
+						shaderDirectory.append((*(++it)).c_str());
+				}
+			}
+#pragma endregion
+
+#pragma region Objects
+			// assets should have been already filled by this point
+			else if (*it == "objects")
+			{
+				string objectDirectory = Parser::currentGameDirectory;
+
+				while (*(++it) != "/objects")
+				{
+					if (*it == "object")
+					{
+						while (*(++it) != "/object")
+						{
+							if (*it == "file")
+							{
+								Parser::currentScene->objects.emplace_back(nullptr);
+								 
+								parse((objectDirectory + *(++it)).c_str(), 
+									Parser::currentScene->objects.back());
+							}
+						} // end while
+					}
+					else if (*it == "directory")
+						objectDirectory.append((*(++it)).c_str());
+				} // end while
+			} // end else if
+#pragma endregion
+		}
+
+		tokens.clear();
+
+		Parser::currentScene = nullptr;
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene = nullptr;
+		if (sdl_image_running)
+			IMG_Quit();
+		string errorMsg = e.what();
+		throw (errorMsg + " occured while reading file " + filepath);
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene = nullptr;
+		if (sdl_image_running)
+			IMG_Quit();
+		throw errorMessage;
+	}
+#pragma endregion
+}
 
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]
@@ -817,7 +604,7 @@ void Triton::parse(Armature type, const char* filepath)
 //	Title: main program
 //
 //	Description: 
-//	[Description of Function’s purpose]
+//	[Description of Function's purpose]
 //
 //	Programmer(s):
 //	[Names involved in creation of this Function]
@@ -852,6 +639,597 @@ void Triton::parse(Armature type, const char* filepath)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //---------------------------------------------------------------------
-void Triton::parse(Game type, const char* filepath)
-{}
+void Triton::parse(const char* filepath, Mesh*& type)
+{
+	vector<vec3> vertices, normals, tangents;
+	vector<vec2> UVs;
+	vector<vector<short>> face_indices;
+	vector<float> weights;
+	vector<vector<unsigned short>> weight_indices;
+	unsigned short vertexGroupCount;
+	unsigned short indicesCount;
+	unsigned short verticesCount;
+	
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new Mesh;
+
+		// parsing file
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+			if (*it == "id")
+			{
+				Parser::meshMap.emplace(*(++it), type);
+			}
+#pragma region Vertices
+			if (*it == "vertices")
+			{
+				advance(it, 2); // skips over "count" token
+				verticesCount = stoi(*it);
+				for (unsigned short i = 0; i < verticesCount; ++i)
+				{
+					float x, y, z;
+					x = stof(*(++it));
+					y = stof(*(++it));
+					z = stof(*(++it));
+
+					vertices.push_back(vec3(x, y, z));
+				}
+			}
+
+#pragma region Vertex_Weights
+			else if (*it == "vertex_groups")
+			{
+				advance(it, 2); // skips over "count" token
+				vertexGroupCount = stoi(*it);
+				advance(it, vertexGroupCount);
+			}
+			else if (*it == "weights")
+			{
+				advance(it, 2); // skips over "count" token
+				unsigned short count = stoi(*it);
+				for (unsigned short i = 0; i < count; ++i)
+				{
+					weights.push_back(stof(*(++it)));
+				}
+			}
+			else if (*it == "weights_indices")
+			{
+				advance(it, 2); // skips over "count" token
+				for (unsigned short i = 0; i < verticesCount; ++i)
+				{
+					weight_indices.push_back(vector<unsigned short>());
+					for (unsigned short j = 0; j < vertexGroupCount; ++j)
+					{
+						weight_indices[i].push_back(stoi(*(++it)));
+					}
+				}
+			}
+#pragma endregion
+
+#pragma endregion
+
+#pragma region UVs
+			else if (*it == "UVs")
+			{
+				advance(it, 2); // skips over "count" token
+				unsigned short count = stoi(*it);
+				for (unsigned short i = 0; i < count; ++i)
+				{
+					float x, y;
+					x = stof(*(++it));
+					y = stof(*(++it));
+
+					UVs.push_back(vec2(x, y));
+				}
+			}
+#pragma endregion
+
+#pragma region Normals
+			else if (*it == "normals")
+			{
+				advance(it, 2); // skips over "count" token
+				unsigned short count = stoi(*it);
+				for (unsigned short i = 0; i < count; ++i)
+				{
+					float x, y, z;
+					x = stof(*(++it));
+					y = stof(*(++it));
+					z = stof(*(++it));
+
+					normals.push_back(vec3(x, y, z));
+				}
+			}
+#pragma endregion
+
+#pragma region Tangents
+			else if (*it == "tangents")
+			{
+				advance(it, 2); // skips over "count" token
+				unsigned short count = stoi(*it);
+				for (unsigned short i = 0; i < count; ++i)
+				{
+					float x, y, z;
+					x = stof(*(++it));
+					y = stof(*(++it));
+					z = stof(*(++it));
+
+					tangents.push_back(vec3(x, y, z));
+				}
+			}
+#pragma endregion
+
+#pragma region Faces
+			else if (*it == "faces")
+			{
+				advance(it, 2); // skips over "count" token
+				indicesCount = stoi(*it) * 3;
+				unsigned short copyIndex = 0;
+				for (unsigned short i = 0; i < indicesCount; ++i)
+				{
+					// creates new empty short array
+					face_indices.push_back(vector<short>());
+					// fills short array with values from tokens
+					for (unsigned short j = 0; j < 5; ++j)
+					{
+						if (*(++it) != "na")
+							face_indices[i].push_back(stoi(*(it)));
+						else
+							face_indices[i].push_back(-2);
+					}
+
+					bool unique = true;
+
+					// checks if array is a unique set of shorts
+					for (unsigned short j = 0; j < i; ++j)
+					{
+						bool sameSet = true;
+
+						for (unsigned short k = 0; k < 5; ++k)
+						{
+							if (face_indices[i][k] != face_indices[j][k])
+							{
+								sameSet = false; break;
+							}
+						}
+
+						if (sameSet)
+						{
+							unique = false;
+							copyIndex = j; break;
+						}
+					}
+
+					if (!unique)
+					{
+						type->indices.push_back(copyIndex);
+						face_indices.pop_back();
+						--indicesCount; --i;
+					}
+					else
+						type->indices.push_back(i);
+				} // end of for
+			} // end of else if
+#pragma endregion
+		} // end of for
+
+		tokens.clear();
+
+		// filling mesh
+		for (unsigned short i = 0; i < face_indices.size(); ++i)
+		{
+			if (face_indices[i][0] != -2)
+				type->vertices.push_back(vertices[face_indices[i][0]]);
+			if (!weight_indices.empty())
+			{
+				type->groups.push_back(uvec4(0));
+				type->weights.push_back(vec4(0.f));
+				for (unsigned short j = 0; j < vertexGroupCount; ++j)
+				{
+					type->groups[i][j] = j;
+					type->weights[i][j] = weights[weight_indices[face_indices[i][0]][j]];
+				}
+			}
+			if (face_indices[i][1] != -2)
+				type->UVs.push_back(UVs[face_indices[i][1]]);
+			if (face_indices[i][2] != -2)
+				type->normals.push_back(normals[face_indices[i][2]]);
+			if (face_indices[i][3] != -2)
+				type->tangents.emplace_back(tangents[face_indices[i][3]], (float)face_indices[i][4]);
+		}
+
+		type->init( // implement a form of vertex formatting later
+			);
+
+		vertices.clear();
+		normals.clear();
+		tangents.clear();
+		face_indices.clear();
+		weights.clear();
+		weight_indices.clear();
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene->meshes.pop_back();
+		vertices.clear();
+		normals.clear();
+		tangents.clear();
+		face_indices.clear();
+		weights.clear();
+		weight_indices.clear();
+		string errorMsg = e.what();
+		throw (errorMsg + "occured while reading file " + filepath);
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene->meshes.pop_back();
+		vertices.clear();
+		normals.clear();
+		tangents.clear();
+		face_indices.clear();
+		weights.clear();
+		weight_indices.clear();
+		throw errorMessage;
+	}
+#pragma endregion
+}
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function's purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
+void Triton::parse(const char* filepath, ObjectEntity*& type)
+{
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new ObjectEntity;
+
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+			if (*it == "id")
+			{
+				Parser::objectMap.emplace(*(++it), type);
+			}
+			else if (*it == "mesh")
+			{
+				// object->mesh = activeScene->meshes.find(*(++it));
+				// safety: program crashes if you try to dereference the end iterator 
+				if (Parser::meshMap.find(*(++it)) != Parser::meshMap.cend())
+					type->mesh = Parser::meshMap[*it];
+			}
+			else if (*it == "material")
+			{
+				if (Parser::materialMap.find(*(++it)) != Parser::materialMap.cend())
+					type->material = Parser::materialMap[*it];
+			}
+		}
+		
+		tokens.clear();
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene->objects.pop_back();
+		string errorMsg = e.what();
+		throw (errorMsg + " occured while reading file " + filepath);
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		Parser::currentScene->objects.pop_back();
+		throw errorMessage;
+	}
+#pragma endregion
+}
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function's purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
+void Triton::parse(const char* filepath, Material*& type)
+{
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new Material;
+
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+			if (*it == "id")
+			{
+				Parser::materialMap.emplace(*(++it), type);
+			}
+			else if (*it == "shader")
+			{
+				type->shader = Parser::shaderMap[*(++it)];
+			}
+			else if (*it == "texture")
+			{
+				advance(it, 2); // skips over type token
+				if (*it == "diffuse")
+				{
+					type->diffuse = Parser::textureMap[*(++it)];
+				}
+			}
+		}
+
+		tokens.clear();
+	}
+#pragma region CatchBlocks
+		catch (const exception& e)
+		{
+			delete type;
+			type = nullptr;
+			string errorMsg = " occurred while reading file '";
+			throw (errorMsg + filepath + "' " + e.what());
+		}
+		catch (const string& errorMessage)
+		{
+			delete type;
+			type = nullptr;
+			throw errorMessage;
+		}
+#pragma endregion
+}
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function's purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
+void Triton::parse(const char* filepath, Texture*& type)
+{
+	try{
+		type = new Texture;
+
+		type->load(filepath);
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		string errorMsg = " occurred while reading file '";
+		throw (errorMsg + filepath + "' " + e.what());
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		throw errorMessage;
+	}
+#pragma endregion
+}
+
+//---------------------------------------------------------------------
+//	Function: [Name of this Function]
+//
+//	Title: main program
+//
+//	Description: 
+//	[Description of Function's purpose]
+//
+//	Programmer(s):
+//	[Names involved in creation of this Function]
+//
+//	Date: [Date Function was started]
+//
+//	Version: [Version of Function. Release is always 1.0]
+//
+//	Testing Environment: 
+//		Hardware: [Type of Machine code was tested on]
+//
+//		Software: [Operating System it was written on]
+//		[Name of software Function was written on]
+//
+//	Input: [Input Types]
+//
+//	Output: [Output Types]
+//
+//	Parameters:
+//	[Parameters of the Functions]
+// 
+//
+//	Returns:
+//	[Expected returns and causes]
+// 
+// 
+//	Called By: [Other Functions calling this one]
+// 
+//	Calls: [Other functions called by this one]
+//
+//	History Log: 
+//	[Initials, date, and succinct list of changes to the Function]
+// 
+//---------------------------------------------------------------------
+void Triton::parse(const char* filepath, Shader*& type)
+{
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new Shader;
+
+		string shaderDirectory = Parser::currentGameDirectory;
+		vector<unsigned short> componentIndices;
+
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+			if (*it == "id")
+			{
+				Parser::shaderMap.emplace(*(++it), type);
+			}
+			else if (*it == "directory")
+			{
+				shaderDirectory.append((*(++it)).c_str());
+			}
+			else if (*it == "component")
+			{
+				advance(it, 2); // skips type token
+				GLenum shaderType;
+				if (*it == "vertex")
+					shaderType = GL_VERTEX_SHADER;
+				else if (*it == "fragment")
+					shaderType = GL_FRAGMENT_SHADER;
+
+				string line;
+				string GLSLstrings = "";
+
+				ifstream file;
+				file.open((shaderDirectory + *(++it)).c_str(), ifstream::in);
+
+				while (file.good())
+				{
+					getline(file, line);
+					GLSLstrings.append(line + "\n");
+				}
+
+				file.close();
+
+				componentIndices.push_back(Shader::createComponent(GLSLstrings, shaderType));
+			}
+		}
+
+		tokens.clear();
+
+		type->init(componentIndices.data());
+
+		componentIndices.clear();
+	}
+#pragma region CatchBlocks
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		string errorMsg = " occurred while reading file '";
+		throw (errorMsg + filepath + "' " + e.what());
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		throw errorMessage;
+	}
+#pragma endregion
+}
+
 #pragma endregion
