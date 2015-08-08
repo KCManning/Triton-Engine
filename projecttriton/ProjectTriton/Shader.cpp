@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------------------
 #include "Shader.h"
-#define ERROR_MAX 1024
+#define ERROR_MAX 256
 
 using namespace Triton;
 
@@ -109,15 +109,13 @@ void Shader::init(unsigned short components[])
 	glBindAttribLocation(handle, TANGENT, "tangent");
 	glBindAttribLocation(handle, WEIGHTS, "weights");
 	glBindAttribLocation(handle, GROUPS, "groups");
-	glBindAttribLocation(handle, uniforms[CAMERA], "camera");
+	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 }
 
 void Shader::bind()
 {
 	glUseProgram(handle);
 	active = this;
-
-	// glUniformMatrix4fv(handle, 1, GL_FALSE, &SceneLevel::camera.View[0][0]);
 }
 
 Shader::~Shader()
