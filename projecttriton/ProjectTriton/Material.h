@@ -1,6 +1,7 @@
 //-------------------------------------------------------------------------------------------------
 #pragma once
 #include "Texture.h"
+#include "Shader.h"
 
 namespace Triton
 {
@@ -15,6 +16,8 @@ namespace Triton
 		Shader* shader;
 
 		Material() {}
+
+		void bind();
 	};
 }
 	

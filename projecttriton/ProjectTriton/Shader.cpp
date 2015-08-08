@@ -1,13 +1,20 @@
 //-------------------------------------------------------------------------------------------------
 #include "Shader.h"
-#define ERROR_MAX 1024
+#define ERROR_MAX 256
 
 using namespace Triton;
 
 // declaration of static member variables
 list<Shader::ShaderComponent*> Shader::Components;
 
-GLint Shader::active = NULL;
+Shader* Shader::active = nullptr;
+
+Shader::Shader()
+{
+	handle = NULL;
+	for (unsigned short i = 0; i < UNIFORM_COUNT; ++i)
+		uniforms[i] = NULL;
+}
 
 Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings)
 {
@@ -102,12 +109,13 @@ void Shader::init(unsigned short components[])
 	glBindAttribLocation(handle, TANGENT, "tangent");
 	glBindAttribLocation(handle, WEIGHTS, "weights");
 	glBindAttribLocation(handle, GROUPS, "groups");
+	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 }
 
 void Shader::bind()
 {
 	glUseProgram(handle);
-	active = handle;
+	active = this;
 }
 
 Shader::~Shader()

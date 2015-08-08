@@ -21,7 +21,7 @@ unordered_map<string, Material*> Parser::materialMap;
 unordered_map<string, Texture*> Parser::textureMap;
 unordered_map<string, Shader*> Parser::shaderMap;
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -61,7 +61,7 @@ unordered_map<string, Shader*> Parser::shaderMap;
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 list<string> Triton::getTokensFromFile(const char* filepath)
 {
 	try{
@@ -168,7 +168,7 @@ list<string> Triton::getTokensFromFile(const char* filepath)
 	}
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -208,7 +208,7 @@ list<string> Triton::getTokensFromFile(const char* filepath)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 list<string> Triton::split(const string &data)
 {
 	try{
@@ -269,7 +269,7 @@ list<string> Triton::split(const string &data)
 
 #pragma region Parsers
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -309,7 +309,7 @@ list<string> Triton::split(const string &data)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, Game*& type)
 {
 	try{
@@ -406,7 +406,7 @@ void Triton::parse(const char* filepath, Game*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -446,7 +446,7 @@ void Triton::parse(const char* filepath, Game*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, SceneLevel*& type)
 {
 	bool sdl_image_running = false;
@@ -598,7 +598,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -638,7 +638,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, Mesh*& type)
 {
 	vector<vec3> vertices, normals, tangents;
@@ -880,7 +880,7 @@ void Triton::parse(const char* filepath, Mesh*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -920,7 +920,7 @@ void Triton::parse(const char* filepath, Mesh*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, ObjectEntity*& type)
 {
 	try{
@@ -969,7 +969,7 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -1009,7 +1009,7 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, Material*& type)
 {
 	try{
@@ -1056,7 +1056,7 @@ void Triton::parse(const char* filepath, Material*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -1096,7 +1096,7 @@ void Triton::parse(const char* filepath, Material*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, Texture*& type)
 {
 	try{
@@ -1121,7 +1121,7 @@ void Triton::parse(const char* filepath, Texture*& type)
 #pragma endregion
 }
 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
 //
 //	Title: main program
@@ -1161,7 +1161,7 @@ void Triton::parse(const char* filepath, Texture*& type)
 //	History Log: 
 //	[Initials, date, and succinct list of changes to the Function]
 // 
-//---------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void Triton::parse(const char* filepath, Shader*& type)
 {
 	try{
