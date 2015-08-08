@@ -3,9 +3,11 @@
 
 using namespace Triton;
 
+Camera SceneLevel::camera;
+
 SceneLevel::SceneLevel()
 {
-	// camera = nullptr;
+	
 }
 
 void SceneLevel::update()
@@ -21,8 +23,15 @@ void SceneLevel::update()
 
 void SceneLevel::draw()
 {
+	
+
 	for (list<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
+		(*it)->material->bind();
+
+		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
+			&camera.View[0][0]);
+		
 		(*it)->draw();
 	}
 }

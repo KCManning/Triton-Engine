@@ -28,6 +28,13 @@ namespace Triton
 
 			ATTRIB_COUNT
 		};
+
+		enum Uniforms
+		{
+			CAMERA,
+			UNIFORM_COUNT
+		};
+
 		// nested object, shader programs are made up of multiple 
 		// components, a vertex and fragment shader is the minimum required for rendering 
 		// the rest are optional, but can be used
@@ -51,7 +58,7 @@ namespace Triton
 			~ShaderComponent(){ glDeleteShader(handle); }
 		};
 		// the currently active shader
-		static GLint active;
+		static Shader* active;
 
 		// static array of shader pieces that all shader programs can access
 		static list<ShaderComponent*> Components;
@@ -66,7 +73,7 @@ namespace Triton
 		static unsigned short createComponent(string& GLSLstrings, GLenum shaderType);
 		
 		// default contructor
-		Shader() { handle = NULL; }
+		Shader();
 
 		// array of indices to Components to use for this program in order 
 		// i.e. vertex shader first, frag shader last
@@ -74,6 +81,8 @@ namespace Triton
 
 		// sets this as the program openGL is currently using
 		void bind();
+
+		GLuint uniforms[UNIFORM_COUNT];
 	
 		// destructor
 		~Shader();
