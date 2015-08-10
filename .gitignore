@@ -1,1 +1,3 @@
 *.opensdf
+*.obj
+*.tlog
