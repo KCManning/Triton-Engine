@@ -1,19 +1,11 @@
-﻿Build started 7/29/2015 12:55:00 PM.
+﻿Build started 8/6/2015 2:30:26 PM.
      1>Project "C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Utilities.cpp main.cpp
-         main.cpp
-         Utilities.cpp
-     1>c:\users\kevin\documents\github\triton-engine\projecttriton\projecttriton\utilities.cpp(508): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\kevin\documents\github\triton-engine\projecttriton\projecttriton\utilities.cpp(571): warning C4018: '<' : signed/unsigned mismatch
-         Generating Code...
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\lib" OpenGL32.lib glew32s.lib glew32.lib SDL2.lib SDL2main.lib SDL2_image.lib SDL2_ttf.lib SDL2test.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.lib" /MACHINE:X86 Debug\Armature.obj
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ode-0.13.1" /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\lib" /LIBPATH:"C:\Program Files (x86)\Visual Leak Detector\lib\Win32" OpenGL32.lib glew32s.lib glew32.lib SDL2.lib SDL2main.lib SDL2_image.lib SDL2_ttf.lib SDL2test.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.lib" /MACHINE:X86 Debug\Armature.obj
          Debug\Camera.obj
          Debug\Display.obj
          Debug\Engine.obj
          Debug\Game.obj
-         Debug\Input.obj
          Debug\main.obj
          Debug\Mesh.obj
          Debug\ObjectEntity.obj
@@ -26,4 +18,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.28
+Time Elapsed 00:00:01.35
