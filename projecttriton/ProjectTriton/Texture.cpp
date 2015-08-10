@@ -11,7 +11,7 @@ void Texture::load(const char* textureFile)
 	if (tempSurface == NULL)
 	{
 		string errorMsg = "failed to load texture: ";
-		throw (errorMsg + '"' + textureFile + '"' + IMG_GetError()).c_str();
+		throw (errorMsg + '"' + textureFile + '"' + IMG_GetError());
 	}
 	
 	// number of pixels, multiplied by the number of components in each pixel, 

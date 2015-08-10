@@ -12,7 +12,7 @@
 
 using glm::vec2;
 using glm::vec3;
-using namespace std;
+//using namespace std;
 
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]
