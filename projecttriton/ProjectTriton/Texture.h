@@ -8,7 +8,7 @@
 #include "GL\glew.h"
 #include <vector>
 
-using namespace std;
+
 
 namespace Triton
 {
@@ -19,7 +19,7 @@ namespace Triton
 	struct Texture
 	{
 		// array of pixel components for the texture
-		vector<unsigned char> pixels;
+		std::vector<unsigned char> pixels;
 		// handle of the texture in openGL
 		GLuint handle;
 

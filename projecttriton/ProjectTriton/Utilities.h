@@ -12,7 +12,7 @@
 
 using glm::vec2;
 using glm::vec3;
-//using namespace std;
+using std::unordered_map;
 
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]

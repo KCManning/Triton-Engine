@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "Shader.h"
 
+using std::list;
+
 namespace Triton
 {
 	// class that loads in and stores the asset files(meshes and textures and whatnot), 

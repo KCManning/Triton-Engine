@@ -2,6 +2,7 @@
 #include "Mesh.h"
 
 using namespace Triton;
+using namespace std;
 
 void Mesh::init()
 {

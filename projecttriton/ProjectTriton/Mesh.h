@@ -6,8 +6,9 @@
 
 #include <vector>
 
-using namespace std;
+//using namespace std;
 using namespace glm;
+using std::vector;
 
 namespace Triton
 {

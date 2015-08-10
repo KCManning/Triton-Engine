@@ -3,7 +3,7 @@
 
 #include "SceneLevel.h"
 
-using namespace std;
+
 
 namespace Triton
 {
@@ -18,7 +18,7 @@ namespace Triton
 		// the current scene being displayed
 		SceneLevel* currentScene;
 		// Game's Directory
-		string directory;
+		std::string directory;
 		// window size settings
 		unsigned short windowHeight;
 		unsigned short windowWidth;
@@ -26,10 +26,10 @@ namespace Triton
 		bool fullscreen;
 		bool desktop_resolution;
 		// game's window title
-		string title;
+		std::string title;
 
 		// list of scene ids and directories
-		unordered_map<string, string> sceneDirectories;
+		std::unordered_map<string, string> sceneDirectories;
 
 		// constructor
 		Game();

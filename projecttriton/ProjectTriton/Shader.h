@@ -7,7 +7,7 @@
 #include <string>
 #include <list>
 
-using namespace std;
+using std::string;
 
 namespace Triton
 {
@@ -61,7 +61,7 @@ namespace Triton
 		static Shader* active;
 
 		// static array of shader pieces that all shader programs can access
-		static list<ShaderComponent*> Components;
+		static std::list<ShaderComponent*> Components;
 
 		// clears the Components list, make sure to call this 
 		static void clearComponents();
@@ -92,7 +92,7 @@ namespace Triton
 	
 	private:
 		// an array of pointers to the Components this shader program is utilizing
-		list<ShaderComponent*> m_components;
+		std::list<ShaderComponent*> m_components;
 	};
 
 	// for error checking during shader creation and linking process

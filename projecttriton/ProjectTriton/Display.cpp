@@ -34,7 +34,7 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 	// checks if sdl encountered an error, by checking if SDL_GetError() returns an empty string
 	if (SDL_GetError()[0] != 0)
 	{
-		string errorMsg = "A GL Attribute failed to be set.";
+		std::string errorMsg = "A GL Attribute failed to be set.";
 		throw (errorMsg + SDL_GetError()).c_str();
 	}
 		

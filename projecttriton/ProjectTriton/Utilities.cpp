@@ -8,6 +8,8 @@
 #include "Utilities.h"
 
 using namespace Triton;
+using namespace std;
+
 
 string Parser::currentGameDirectory = "";
 

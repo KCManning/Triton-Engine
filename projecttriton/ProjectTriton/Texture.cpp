@@ -10,7 +10,7 @@ void Texture::load(const char* textureFile)
 	// checks if an error occurred when creating the surface
 	if (tempSurface == NULL)
 	{
-		string errorMsg = "failed to load texture: ";
+		std::string errorMsg = "failed to load texture: ";
 		throw (errorMsg + '"' + textureFile + '"' + IMG_GetError());
 	}
 	

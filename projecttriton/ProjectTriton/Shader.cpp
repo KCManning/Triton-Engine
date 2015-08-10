@@ -3,6 +3,7 @@
 #define ERROR_MAX 256
 
 using namespace Triton;
+using namespace std;
 
 // declaration of static member variables
 list<Shader::ShaderComponent*> Shader::Components;

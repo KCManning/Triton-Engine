@@ -7,7 +7,7 @@
 
 using glm::vec3;
 using glm::quat;
-using namespace std;
+using std::string;
 
 namespace Triton
 {
@@ -61,7 +61,7 @@ namespace Triton
 		unsigned short boneCount;
 
 		// map of poseIDs, to animation indexes in the bones
-		unordered_map<string, unsigned short> animations;
+		std::unordered_map<string, unsigned short> animations;
 
 		// calls play across bone array using the currentAnimationIndex
 		void play();
