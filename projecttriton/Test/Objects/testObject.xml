@@ -12,7 +12,7 @@
 	</idle_anim>
 	-->
 	<material>
-		Grid
+		Grid;
 	</material>
 	<!--
 	--not yet implemented
