@@ -1,21 +1,5 @@
-﻿Build started 8/6/2015 2:30:26 PM.
-     1>Project "C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" on node 2 (Build target(s)).
-     1>Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ode-0.13.1" /LIBPATH:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\lib" /LIBPATH:"C:\Program Files (x86)\Visual Leak Detector\lib\Win32" OpenGL32.lib glew32s.lib glew32.lib SDL2.lib SDL2main.lib SDL2_image.lib SDL2_ttf.lib SDL2test.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.lib" /MACHINE:X86 Debug\Armature.obj
-         Debug\Camera.obj
-         Debug\Display.obj
-         Debug\Engine.obj
-         Debug\Game.obj
-         Debug\main.obj
-         Debug\Mesh.obj
-         Debug\ObjectEntity.obj
-         Debug\SceneLevel.obj
-         Debug\Shader.obj
-         Debug\Texture.obj
-         Debug\Utilities.obj
-         ProjectTriton.vcxproj -> C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\Debug\ProjectTriton.exe
-     1>Done Building Project "C:\Users\Kevin\Documents\GitHub\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" (Build target(s)).
+﻿Build started 8/10/2015 2:05:18 PM.
 
 Build succeeded.
 
-Time Elapsed 00:00:01.35
+Time Elapsed 00:00:00.10
