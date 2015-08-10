@@ -513,7 +513,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 						Parser::currentScene->textures.emplace_back(nullptr);
 
 						parse((textureDirectory + *it).c_str(), Parser::currentScene->textures.back());
-						Parser::textureMap.emplace(*(++it), Parser::currentScene->textures.back());
+						Parser::textureMap[*(++it)] = Parser::currentScene->textures.back();
 					}
 					else
 						textureDirectory.append((*(++it)).c_str());
@@ -660,7 +660,7 @@ void Triton::parse(const char* filepath, Mesh*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::meshMap.emplace(*(++it), type);
+				Parser::meshMap[*(++it)] = type;
 			}
 #pragma region Vertices
 			if (*it == "vertices")
@@ -932,7 +932,7 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::objectMap.emplace(*(++it), type);
+				Parser::objectMap[*(++it)] = type;
 			}
 			else if (*it == "mesh")
 			{
@@ -1021,7 +1021,7 @@ void Triton::parse(const char* filepath, Material*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::materialMap.emplace(*(++it), type);
+				Parser::materialMap[*(++it)] = type;
 			}
 			else if (*it == "shader")
 			{
@@ -1176,7 +1176,7 @@ void Triton::parse(const char* filepath, Shader*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::shaderMap.emplace(*(++it), type);
+				Parser::shaderMap[*(++it)] = type;
 			}
 			else if (*it == "directory")
 			{

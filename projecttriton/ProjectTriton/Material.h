@@ -15,7 +15,7 @@ namespace Triton
 		// Texture* specular;
 		Shader* shader;
 
-		Material() {}
+		Material();
 
 		void bind();
 	};

@@ -23,8 +23,6 @@ void SceneLevel::update()
 
 void SceneLevel::draw()
 {
-	
-
 	for (list<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
 		(*it)->material->bind();
