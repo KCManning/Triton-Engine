@@ -5,8 +5,9 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "Shader.h"
+#include <vector>
 
-using std::list;
+using std::vector;
 
 namespace Triton
 {
@@ -18,12 +19,12 @@ namespace Triton
 	class SceneLevel
 	{
 	public:
-		list<Mesh*> meshes;
-		list<Armature*> armatures;
-		list<Texture*> textures;
-		list<Shader*> shaders;
-		list<Material*> materials;
-		list<ObjectEntity*> objects;
+		vector<Mesh*> meshes;
+		vector<Armature*> armatures;
+		vector<Texture*> textures;
+		vector<Shader*> shaders;
+		vector<Material*> materials;
+		vector<ObjectEntity*> objects;
 
 		static Camera camera;
 

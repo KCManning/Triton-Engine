@@ -8,8 +8,6 @@
 #include "GL\glew.h"
 #include <vector>
 
-
-
 namespace Triton
 {
 	// helper function for Texture class that obtains the pixel information in an SDL Surface,

@@ -10,9 +10,8 @@
 #include <fstream>
 #include <unordered_map>
 
-using glm::vec2;
-using glm::vec3;
 using std::unordered_map;
+using std::list;
 
 //---------------------------------------------------------------------
 //	Function: [Name of this Function]
@@ -67,20 +66,31 @@ enum storageType
 namespace Triton
 {
 	// static class to store values to accessed by parse fuctions
-	struct Parser{
+	class Parser{
+	public:
 		// current game Directory being parsed from
-		static string currentGameDirectory;
+		string currentGameDirectory;
 		// current scene for which assets and objects are being parsed
-		static SceneLevel*& currentScene;
-		// current string value id's and pointers to the objects they refer to
-		static unordered_map<string, Mesh*> meshMap;
-		static unordered_map<string, ObjectEntity*> objectMap;
-		static unordered_map<string, Material*> materialMap;
-		static unordered_map<string, Texture*> textureMap;
-		static unordered_map<string, Shader*> shaderMap;
+		SceneLevel*& currentScene;
+		// current string value id's and the index of where they are in their
+		// class's object array in the currentScene Object of the 
+		// currentGame
+		unordered_map<string, unsigned short> meshMap;
+		unordered_map<string, unsigned short> objectMap;
+		unordered_map<string, unsigned short> materialMap;
+		unordered_map<string, unsigned short> textureMap;
+		unordered_map<string, unsigned short> shaderMap;
+
+		Parser() : currentScene(m_nullScene) { m_nullScene = nullptr; }
+
+		void clear();
+
+		~Parser(){ clear(); }
+
 	private:
 		// solely for initializing currentScene pointer reference
-		static SceneLevel* m_nullScene;
+		SceneLevel* m_nullScene;
+
 	};
 	
 	// converts file in filepath specified and returns the strings of said file, removing 
@@ -93,18 +103,18 @@ namespace Triton
 	// parses scene script xml file that calls asset and object parse functions
 	void parse(const char* filepath, SceneLevel*& type);
 	// parses object xml file and assigns pointers to object components
-	void parse(const char* filepath, ObjectEntity*& type);
+	string parse(const char* filepath, ObjectEntity*& type);
 	// parses a blender exported mesh xml file
-	void parse(const char* filepath, Mesh*& type);
+	string parse(const char* filepath, Mesh*& type);
 	// parses a blender exported armature xml file
-	void parse(const char* filepath, Armature*& type);
+	string parse(const char* filepath, Armature*& type);
 	// reads material xml file and looks for pointers to material components using string id values
 	// from file
-	void parse(const char* filepath, Material*& type);
+	string parse(const char* filepath, Material*& type);
 	// gets GLSL strings for contructing shader components
-	void parse(const char* filepath, Shader*& type);
+	string parse(const char* filepath, Shader*& type);
 	// uses sdl image to load a texture into memory
 	void parse(const char* filepath, Texture*& type);
 	// grabs the line of the file in filepath, and puts them through the shader constructor
-	void parse(const char* filepath, Shader*& type);
+	string parse(const char* filepath, Shader*& type);
 }

@@ -1,6 +1,7 @@
 //-------------------------------------------------------------------------------------------------
 #include "Display.h"
 #include "Utilities.h"
+#include <iostream>
 
 namespace Triton
 {

@@ -6,8 +6,6 @@ using namespace Triton;
 using namespace std;
 
 // declaration of static member variables
-list<Shader::ShaderComponent*> Shader::Components;
-
 Shader* Shader::active = nullptr;
 
 Shader::Shader()
@@ -15,15 +13,23 @@ Shader::Shader()
 	handle = NULL;
 	for (unsigned short i = 0; i < UNIFORM_COUNT; ++i)
 		uniforms[i] = NULL;
+	for (unsigned short i = 0; i < SHADERTYPE_COUNT; ++i)
+		m_components[i] = NULL;
+	m_componentCount = 0;
 }
 
-Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings)
+void Shader::addComponent(string& GLSLstrings, GLenum shaderType)
 {
-	handle = glCreateShader(shaderType);
+	m_components[m_componentCount] = glCreateShader(shaderType);
+
+	GLuint componentHandle = m_components[m_componentCount++];
 
 	// can't call checkShader error because we don't have a handle
-	if (handle == NULL)
-		cerr << "Error: Shader creation failed!" << endl;
+	if (componentHandle == NULL)
+	{
+		string errorMsg = "Error: Shader creation failed!";
+		throw errorMsg;
+	}
 
 	// type conversion between c++ types and openGL types
 	const GLchar* GLSL_c_strings[1];
@@ -33,76 +39,29 @@ Shader::ShaderComponent::ShaderComponent(GLenum shaderType, string& GLSLstrings)
 	GLSL_character_count[0] = GLSLstrings.length();
 
 	// sends the shader source code to openGL
-	glShaderSource(handle, 1, GLSL_c_strings, GLSL_character_count);
+	glShaderSource(componentHandle, 1, GLSL_c_strings, GLSL_character_count);
 	// compiles the shader
-	glCompileShader(handle);
+	glCompileShader(componentHandle);
 
 	// error checking to see if the shader compiled correctly
 	try{
-		checkShaderError(handle, GL_COMPILE_STATUS, false, "Error: Shader Compilation Failed: ");
+		checkShaderError(componentHandle, GL_COMPILE_STATUS, false, "Error: Shader Compilation Failed: ");
 	}
 	catch (const string& errorMessage)
 	{
 		throw errorMessage;
 	}
-		
+
+	glAttachShader(handle, componentHandle);
 }
 
-unsigned short Shader::createComponent(string& GLSLstrings, GLenum shaderType)
-{
-	ShaderComponent* component = new ShaderComponent(shaderType, GLSLstrings);
-	
-	// constructs shader component and adds it to the components list
-	Components.emplace_back(component);
-
-	return Components.size() - 1;
-}
-
-void Shader::clearComponents()
-{
-	for (list<ShaderComponent*>::iterator it = Components.begin(); it != Components.end(); ++it)
-		delete *it;
-	Components.clear();
-}
-
-void Shader::init(unsigned short components[])
+void Shader::init()
 {
 	handle = glCreateProgram();
+}
 
-	unsigned short length = (sizeof(components) / sizeof(short));
-	for (unsigned short i = 0; i < length; ++i)
-	{
-		list<ShaderComponent*>::iterator it = Components.begin();
-		for (unsigned short j = 0; j < components[i]; ++j)
-			++it;
-			
-		glAttachShader(handle, (*it)->handle);
-		m_components.push_back(*it);
-	}
-
-	// what was here is now further down
-
-	glLinkProgram(handle);
-	try{
-		checkShaderError(handle, GL_LINK_STATUS, true, "Error: Program Linking Failed: ");
-	}
-	catch (const char* errorMessage)
-	{
-		throw errorMessage;
-	}
-
-
-	glValidateProgram(handle);
-	try{
-		checkShaderError(handle, GL_VALIDATE_STATUS, true, "Error: Program is Invalid: ");
-	}
-	catch (const char* errorMessage)
-	{
-		throw errorMessage;
-	}
-
-	// ^^^this was up there^^^
-
+void Shader::compile()
+{
 	// binds the locations of these variables in the shader program to these attribute locations
 	glBindAttribLocation(handle, VERTEX, "vertex");
 	glBindAttribLocation(handle, UV, "UV");
@@ -110,7 +69,24 @@ void Shader::init(unsigned short components[])
 	glBindAttribLocation(handle, TANGENT, "tangent");
 	glBindAttribLocation(handle, WEIGHTS, "weights");
 	glBindAttribLocation(handle, GROUPS, "groups");
-	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
+	
+	glLinkProgram(handle);
+	try{
+		checkShaderError(handle, GL_LINK_STATUS, true, "Error: Program Linking Failed: ");
+	}
+	catch (const string& errorMessage)
+	{
+		throw errorMessage;
+	}
+
+	glValidateProgram(handle);
+	try{
+		checkShaderError(handle, GL_VALIDATE_STATUS, true, "Error: Program is Invalid: ");
+	}
+	catch (const string& errorMessage)
+	{
+		throw errorMessage;
+	}
 }
 
 void Shader::bind()
@@ -121,7 +97,13 @@ void Shader::bind()
 
 Shader::~Shader()
 {
-	m_components.clear();
+	for (unsigned short i = 0; i < m_componentCount; ++i)
+	{
+		glDetachShader(handle, m_components[i]);
+		glDeleteShader(m_components[i]);
+	}
+
+	glDeleteProgram(handle);
 }
 
 void Triton::checkShaderError(GLuint shaderHandle, GLuint errorFlag, bool isProgram,

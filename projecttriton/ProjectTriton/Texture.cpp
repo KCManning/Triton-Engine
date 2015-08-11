@@ -51,7 +51,7 @@ void Texture::bind()
 {
 	// multiple images can be assigned to other texture types such as cube maps, GL_TEXTURE_CUBE
 	// this case we only have one image for GL_TEXTURE_2D
-	glActiveTexture(0);
+	glActiveTexture(GL_TEXTURE0);
 	// binds texture for reading and writing
 	glBindTexture(GL_TEXTURE_2D, handle);
 }

@@ -7,7 +7,10 @@
 #include <vector>
 
 //using namespace std;
-using namespace glm;
+using glm::vec3;
+using glm::vec2;
+using glm::vec4;
+using glm::uvec4;
 using std::vector;
 
 namespace Triton

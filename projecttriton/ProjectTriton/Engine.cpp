@@ -27,6 +27,9 @@ Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 
 void Engine::update()
 {
+	// clear stuff on the buffer you are about to draw on
+	m_display.clear();
+	
 	Uint32 frameStartTime = SDL_GetTicks();
 	
 	while (SDL_PollEvent(&m_event))
@@ -52,9 +55,6 @@ void Engine::update()
 	{
 		SDL_Delay(Uint32(1000.f / 60 - frameTime));
 	}
-	
-	// clear stuff on the buffer you are about to draw on
-	m_display.clear();
 }
 
 void Engine::loadGame(const char* GameFile)
@@ -100,7 +100,6 @@ Engine::~Engine()
 		currentGame->quit();
 	delete currentGame;
 	currentGame = nullptr;
-	Shader::clearComponents();
 
 	SDL_Quit();
 }

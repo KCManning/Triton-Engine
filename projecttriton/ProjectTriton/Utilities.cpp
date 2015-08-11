@@ -10,18 +10,20 @@
 using namespace Triton;
 using namespace std;
 
+using glm::vec2;
+using glm::vec3;
 
-string Parser::currentGameDirectory = "";
+Parser parser;
 
-SceneLevel* Parser::m_nullScene = nullptr;
-
-SceneLevel*& Parser::currentScene = Parser::m_nullScene;
-
-unordered_map<string, Mesh*> Parser::meshMap;
-unordered_map<string, ObjectEntity*> Parser::objectMap;
-unordered_map<string, Material*> Parser::materialMap;
-unordered_map<string, Texture*> Parser::textureMap;
-unordered_map<string, Shader*> Parser::shaderMap;
+void Parser::clear()
+{
+	currentGameDirectory.clear();
+	meshMap.clear();
+	objectMap.clear();
+	materialMap.clear();
+	textureMap.clear();
+	shaderMap.clear();
+}
 
 //-------------------------------------------------------------------------------------------------
 //	Function: [Name of this Function]
@@ -322,7 +324,7 @@ void Triton::parse(const char* filepath, Game*& type)
 			if (*it == "directory")
 			{
 				type->directory = *(++it);
-				Parser::currentGameDirectory = type->directory;
+				parser.currentGameDirectory = type->directory;
 			}
 			else if (*it == "window")
 			{
@@ -372,22 +374,12 @@ void Triton::parse(const char* filepath, Game*& type)
 
 		tokens.clear();
 
-		Parser::currentGameDirectory.clear();
-		Parser::meshMap.clear();
-		Parser::objectMap.clear();
-		Parser::materialMap.clear();
-		Parser::textureMap.clear();
-		Parser::shaderMap.clear();
+		parser.clear();
 	}
 #pragma region CatchBlocks
 	catch (const exception& e)
 	{
-		Parser::currentGameDirectory.clear();
-		Parser::meshMap.clear();
-		Parser::objectMap.clear();
-		Parser::materialMap.clear();
-		Parser::textureMap.clear();
-		Parser::shaderMap.clear();
+		parser.clear();
 		string errorMsg = " occurred while reading file '";
 		delete type;
 		type = nullptr;
@@ -395,12 +387,7 @@ void Triton::parse(const char* filepath, Game*& type)
 	}
 	catch (const string& errorMessage)
 	{
-		Parser::currentGameDirectory.clear();
-		Parser::meshMap.clear();
-		Parser::objectMap.clear();
-		Parser::materialMap.clear();
-		Parser::textureMap.clear();
-		Parser::shaderMap.clear();
+		parser.clear();
 		delete type;
 		type = nullptr;
 		throw errorMessage;
@@ -458,22 +445,24 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 
 		type = new SceneLevel;
 
-		Parser::currentScene = type;
+		parser.currentScene = type;
 
 		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
 #pragma region Meshes
 			if (*it == "meshes")
 			{
-				string meshDirectory = Parser::currentGameDirectory;
+				string meshDirectory = parser.currentGameDirectory;
 
 				while (*(++it) != "/meshes")
 				{
 					if (*it != "directory")
 					{
-						Parser::currentScene->meshes.emplace_back(nullptr);
+						parser.currentScene->meshes.emplace_back(nullptr);
 						
-						parse((meshDirectory + *it).c_str(), Parser::currentScene->meshes.back());
+						parser.meshMap[parse(
+							(meshDirectory + *it).c_str(), parser.currentScene->meshes.back())]
+							= parser.currentScene->meshes.size() - 1;
 					}
 					else
 						meshDirectory.append((*(++it)).c_str());
@@ -484,15 +473,18 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 #pragma region Materials
 			else if (*it == "materials")
 			{
-				string materialDirectory = Parser::currentGameDirectory;
+				string materialDirectory = parser.currentGameDirectory;
 				
 				while (*(++it) != "/materials")
 				{
 					if (*it != "directory")
 					{
-						Parser::currentScene->materials.emplace_back(nullptr);
+						parser.currentScene->materials.emplace_back(nullptr);
 
-						parse((materialDirectory + *it).c_str(), Parser::currentScene->materials.back());
+						parser.materialMap[parse(
+							(materialDirectory + *it).c_str(), 
+							parser.currentScene->materials.back())]
+							= parser.currentScene->materials.size() - 1;
 					}
 					else
 						materialDirectory.append((*(++it)).c_str());
@@ -506,16 +498,17 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 				IMG_Init(IMG_INIT_PNG);
 				sdl_image_running = true;
 
-				string textureDirectory = Parser::currentGameDirectory;
+				string textureDirectory = parser.currentGameDirectory;
 
 				while (*(++it) != "/textures")
 				{
 					if (*it != "directory")
 					{
-						Parser::currentScene->textures.emplace_back(nullptr);
+						parser.currentScene->textures.emplace_back(nullptr);
 
-						parse((textureDirectory + *it).c_str(), Parser::currentScene->textures.back());
-						Parser::textureMap[*(++it)] = Parser::currentScene->textures.back();
+						parse((textureDirectory + *it).c_str(), 
+							parser.currentScene->textures.back());
+						parser.textureMap[*(++it)] = parser.currentScene->textures.size() - 1;
 					}
 					else
 						textureDirectory.append((*(++it)).c_str());
@@ -529,15 +522,17 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 #pragma region Shaders
 			else if (*it == "shaders")
 			{
-				string shaderDirectory = Parser::currentGameDirectory;
+				string shaderDirectory = parser.currentGameDirectory;
 
 				while (*(++it) != "/shaders")
 				{
 					if (*it != "directory")
 					{
-						Parser::currentScene->shaders.emplace_back(nullptr);
+						parser.currentScene->shaders.emplace_back(nullptr);
 
-						parse((shaderDirectory + *it).c_str(), Parser::currentScene->shaders.back());
+						parser.shaderMap[parse(
+							(shaderDirectory + *it).c_str(), parser.currentScene->shaders.back())]
+							= parser.currentScene->shaders.size() - 1;
 					}
 					else
 						shaderDirectory.append((*(++it)).c_str());
@@ -549,7 +544,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 			// assets should have been already filled by this point
 			else if (*it == "objects")
 			{
-				string objectDirectory = Parser::currentGameDirectory;
+				string objectDirectory = parser.currentGameDirectory;
 
 				while (*(++it) != "/objects")
 				{
@@ -559,10 +554,12 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 						{
 							if (*it == "file")
 							{
-								Parser::currentScene->objects.emplace_back(nullptr);
+								parser.currentScene->objects.emplace_back(nullptr);
 								 
-								parse((objectDirectory + *(++it)).c_str(), 
-									Parser::currentScene->objects.back());
+								parser.objectMap[parse(
+									(objectDirectory + *(++it)).c_str(), 
+									parser.currentScene->objects.back())]
+									= parser.currentScene->objects.size() - 1;
 							}
 						} // end while
 					}
@@ -575,14 +572,14 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 
 		tokens.clear();
 
-		Parser::currentScene = nullptr;
+		parser.currentScene = nullptr;
 	}
 #pragma region CatchBlocks
 	catch (const exception& e)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene = nullptr;
+		parser.currentScene = nullptr;
 		if (sdl_image_running)
 			IMG_Quit();
 		string errorMsg = e.what();
@@ -592,7 +589,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene = nullptr;
+		parser.currentScene = nullptr;
 		if (sdl_image_running)
 			IMG_Quit();
 		throw errorMessage;
@@ -641,7 +638,7 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //-------------------------------------------------------------------------------------------------
-void Triton::parse(const char* filepath, Mesh*& type)
+string Triton::parse(const char* filepath, Mesh*& type)
 {
 	vector<vec3> vertices, normals, tangents;
 	vector<vec2> UVs;
@@ -651,6 +648,8 @@ void Triton::parse(const char* filepath, Mesh*& type)
 	unsigned short vertexGroupCount;
 	unsigned short indicesCount;
 	unsigned short verticesCount;
+
+	string id;
 	
 	try{
 		list<string> tokens = getTokensFromFile(filepath);
@@ -662,7 +661,7 @@ void Triton::parse(const char* filepath, Mesh*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::meshMap[*(++it)] = type;
+				id = *(++it);
 			}
 #pragma region Vertices
 			if (*it == "vertices")
@@ -850,13 +849,15 @@ void Triton::parse(const char* filepath, Mesh*& type)
 		face_indices.clear();
 		weights.clear();
 		weight_indices.clear();
+
+		return id;
 	}
 #pragma region CatchBlocks
 	catch (const exception& e)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene->meshes.pop_back();
+		parser.currentScene->meshes.pop_back();
 		vertices.clear();
 		normals.clear();
 		tangents.clear();
@@ -870,7 +871,7 @@ void Triton::parse(const char* filepath, Mesh*& type)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene->meshes.pop_back();
+		parser.currentScene->meshes.pop_back();
 		vertices.clear();
 		normals.clear();
 		tangents.clear();
@@ -923,8 +924,10 @@ void Triton::parse(const char* filepath, Mesh*& type)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //-------------------------------------------------------------------------------------------------
-void Triton::parse(const char* filepath, ObjectEntity*& type)
+string Triton::parse(const char* filepath, ObjectEntity*& type)
 {
+	string id;
+	
 	try{
 		list<string> tokens = getTokensFromFile(filepath);
 
@@ -934,30 +937,32 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::objectMap[*(++it)] = type;
+				id = *(++it);
 			}
 			else if (*it == "mesh")
 			{
 				// object->mesh = activeScene->meshes.find(*(++it));
 				// safety: program crashes if you try to dereference the end iterator 
-				if (Parser::meshMap.find(*(++it)) != Parser::meshMap.cend())
-					type->mesh = Parser::meshMap[*it];
+				if (parser.meshMap.find(*(++it)) != parser.meshMap.cend())
+					type->mesh = parser.currentScene->meshes[parser.meshMap[*it]];
 			}
 			else if (*it == "material")
 			{
-				if (Parser::materialMap.find(*(++it)) != Parser::materialMap.cend())
-					type->material = Parser::materialMap[*it];
+				if (parser.materialMap.find(*(++it)) != parser.materialMap.cend())
+					type->material = parser.currentScene->materials[parser.materialMap[*it]];
 			}
 		}
 		
 		tokens.clear();
+
+		return id;
 	}
 #pragma region CatchBlocks
 	catch (const exception& e)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene->objects.pop_back();
+		parser.currentScene->objects.pop_back();
 		string errorMsg = e.what();
 		throw (errorMsg + " occured while reading file " + filepath);
 	}
@@ -965,7 +970,7 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 	{
 		delete type;
 		type = nullptr;
-		Parser::currentScene->objects.pop_back();
+		parser.currentScene->objects.pop_back();
 		throw errorMessage;
 	}
 #pragma endregion
@@ -1012,8 +1017,10 @@ void Triton::parse(const char* filepath, ObjectEntity*& type)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //-------------------------------------------------------------------------------------------------
-void Triton::parse(const char* filepath, Material*& type)
+string Triton::parse(const char* filepath, Material*& type)
 {
+	string id;
+	
 	try{
 		list<string> tokens = getTokensFromFile(filepath);
 
@@ -1023,23 +1030,25 @@ void Triton::parse(const char* filepath, Material*& type)
 		{
 			if (*it == "id")
 			{
-				Parser::materialMap[*(++it)] = type;
+				id = *(++it);
 			}
 			else if (*it == "shader")
 			{
-				type->shader = Parser::shaderMap[*(++it)];
+				type->shader = parser.currentScene->shaders[parser.shaderMap[*(++it)]];
 			}
 			else if (*it == "texture")
 			{
 				advance(it, 2); // skips over type token
 				if (*it == "diffuse")
 				{
-					type->diffuse = Parser::textureMap[*(++it)];
+					type->diffuse = parser.currentScene->textures[parser.textureMap[*(++it)]];
 				}
 			}
 		}
 
 		tokens.clear();
+
+		return id;
 	}
 #pragma region CatchBlocks
 		catch (const exception& e)
@@ -1164,21 +1173,24 @@ void Triton::parse(const char* filepath, Texture*& type)
 //	[Initials, date, and succinct list of changes to the Function]
 // 
 //-------------------------------------------------------------------------------------------------
-void Triton::parse(const char* filepath, Shader*& type)
+string Triton::parse(const char* filepath, Shader*& type)
 {
+	string id;
+	
 	try{
 		list<string> tokens = getTokensFromFile(filepath);
 
 		type = new Shader;
 
-		string shaderDirectory = Parser::currentGameDirectory;
-		vector<unsigned short> componentIndices;
+		string shaderDirectory = parser.currentGameDirectory;
+
+		type->init();
 
 		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
 			if (*it == "id")
 			{
-				Parser::shaderMap[*(++it)] = type;
+				id = *(++it);
 			}
 			else if (*it == "directory")
 			{
@@ -1207,15 +1219,15 @@ void Triton::parse(const char* filepath, Shader*& type)
 
 				file.close();
 
-				componentIndices.push_back(Shader::createComponent(GLSLstrings, shaderType));
+				type->addComponent(GLSLstrings, shaderType);
 			}
 		}
 
 		tokens.clear();
 
-		type->init(componentIndices.data());
+		type->compile();
 
-		componentIndices.clear();
+		return id;
 	}
 #pragma region CatchBlocks
 	catch (const exception& e)

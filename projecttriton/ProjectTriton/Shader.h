@@ -3,7 +3,6 @@
 #include "GL\glew.h"
 #define GLM_SWIZZLE 
 
-#include <iostream>
 #include <string>
 #include <list>
 
@@ -35,49 +34,37 @@ namespace Triton
 			UNIFORM_COUNT
 		};
 
-		// nested object, shader programs are made up of multiple 
-		// components, a vertex and fragment shader is the minimum required for rendering 
-		// the rest are optional, but can be used
+		enum ShaderType
+		{
+			VERTEX_SHADER,
+			FRAGMENT_SHADER,
+			SHADERTYPE_COUNT
+		};
+
 		// GL_COMPUTE_SHADER, only available in openGL 4.3 and later
 		// GL_VERTEX_SHADER, 
 		// GL_TESS_CONTROL_SHADER, 
 		// GL_TESS_EVALUATION_SHADER, 
 		// GL_GEOMETRY_SHADER, 
 		// or GL_FRAGMENT_SHADER
-		struct ShaderComponent
-		{
-			// handle openGL returned that references the shader
-			GLint handle;
-
-			// contructor: 
-			// shaderType = type of shader(compute, vertex, tess, etc.)
-			// GLSLstrings = strings of the glsl file
-			ShaderComponent(GLenum shaderType, string& GLSLstrings);
-	
-			// destructor
-			~ShaderComponent(){ glDeleteShader(handle); }
-		};
+		
 		// the currently active shader
 		static Shader* active;
-
-		// static array of shader pieces that all shader programs can access
-		static std::list<ShaderComponent*> Components;
-
-		// clears the Components list, make sure to call this 
-		static void clearComponents();
 	
 		// static function that adds a shader component to the list and returns the index
 		// of that component in the Components array
 		// GLSLstrings = strings of the glsl file, essentially taking it line by line
 		// shaderType = type of shader component to be created
-		static unsigned short createComponent(string& GLSLstrings, GLenum shaderType);
+		void addComponent(string& GLSLstrings, GLenum shaderType);
 		
 		// default contructor
 		Shader();
 
-		// array of indices to Components to use for this program in order 
-		// i.e. vertex shader first, frag shader last
-		void init(unsigned short components[]);
+		// assign program handle to handle member
+		void init();
+
+		// compile shader program
+		void compile();
 
 		// sets this as the program openGL is currently using
 		void bind();
@@ -89,10 +76,9 @@ namespace Triton
 		
 		// shader program handle
 		GLint handle;
-	
 	private:
-		// an array of pointers to the Components this shader program is utilizing
-		std::list<ShaderComponent*> m_components;
+		GLuint m_components[SHADERTYPE_COUNT];
+		unsigned short m_componentCount;
 	};
 
 	// for error checking during shader creation and linking process
