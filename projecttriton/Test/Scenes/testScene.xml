@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene id="Test Scene">
+	<!--Shaders should come first I guess-->
+	<shaders directory = "Shaders/">
+		"phong.xml";
+	</shaders>
 	<meshes directory = "Models/">
 		"cube.xml";
 	</meshes>
 	<textures directory = "Textures/">
 		"UVGrid.png", UVGrid;
 	</textures>
-	<shaders directory = "Shaders/">
-		"phong.xml";
-	</shaders>
 	<!--always put materials after shaders and textures-->
 	<materials directory = "Materials/">
 		"Grid.xml";

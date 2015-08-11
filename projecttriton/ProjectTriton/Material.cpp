@@ -12,8 +12,6 @@ Material::Material()
 
 void Material::bind()
 {
-	if (shader)
-		shader->bind();
-	if (diffuse)
-		diffuse->bind();
+	shader->bind();
+	diffuse->bind();
 }

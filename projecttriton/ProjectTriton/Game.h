@@ -3,8 +3,6 @@
 
 #include "SceneLevel.h"
 
-
-
 namespace Triton
 {
 	// class that stores scene/SceneLevel files to be loaded, and 

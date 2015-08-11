@@ -86,7 +86,7 @@ void Mesh::init()
 		 if (!indices.empty())
 		 {
 		 	// only one per vao
-		 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[INDEX_BUFFER - skippedBuffers]);
 		 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), &indices[0],
 		 		GL_STATIC_DRAW);
 		 }
