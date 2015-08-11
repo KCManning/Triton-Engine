@@ -1,3 +1,5 @@
+#version 400
+
 attribute vec3 vertex;
 attribute vec2 UV;
 attribute vec3 normal;

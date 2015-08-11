@@ -15,6 +15,9 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 	if (SDL_WasInit(SDL_INIT_VIDEO) != SDL_INIT_VIDEO)
 		throw "SDL_Video was not initialized for Display class.";
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+
 	// all of these return a zero or negative number on error
 	// size of each color channel for the frame buffer, essentialy amount of data for each pixel
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8); 
@@ -37,7 +40,6 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 		std::string errorMsg = "A GL Attribute failed to be set.";
 		throw (errorMsg + SDL_GetError()).c_str();
 	}
-		
 
 	// creates a window that is able to be set with an openGL context
 	m_window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
