@@ -9,7 +9,7 @@ void Mesh::init()
 	if (!vertices.empty())
 	{
 		// generates a vertex array object and assigns the handle to vao
-		glGenVertexArrays(1, &vao);
+		glGenVertexArrays(1, &vao);//*** Breaking here when run!
 		// binds the vao for editting
 		glBindVertexArray(vao);
 

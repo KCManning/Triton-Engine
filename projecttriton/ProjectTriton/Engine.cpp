@@ -62,7 +62,7 @@ void Engine::loadGame(const char* GameFile)
 	try{
 		Uint32 startOfLoadTime = SDL_GetTicks();
 		currentGame = new Game;
-		parse(GameFile, currentGame);
+		parse(GameFile, currentGame);//*** Unhandled exception
 		std::cout << "Game took " << SDL_GetTicks() - startOfLoadTime << " milliseconds to load"
 			<< std::endl;
 		inGame = true;

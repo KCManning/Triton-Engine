@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
 		engine.loadGame("../Test/testgame.xml");
 		
-		while (!engine.Quit)
+		while (!engine.Quit)//*** Unhandled exception
 			engine.update();
 	}
 	catch (const std::exception& error)

@@ -846,7 +846,7 @@ string Triton::parse(const char* filepath, Mesh*& type)
 		type->init( // implement a form of vertex formatting later
 			);
 
-		vertices.clear();
+		vertices.clear();//** Also breaking here
 		normals.clear();
 		tangents.clear();
 		face_indices.clear();
