@@ -6,7 +6,7 @@
 #include <vld.h>
 #include "Engine.h"
 
-using namespace std;
+//using namespace std;
 using namespace Triton;
 
 int main(int argc, char** argv)
@@ -22,15 +22,15 @@ int main(int argc, char** argv)
 		while (!engine.Quit)
 			engine.update();
 	}
-	catch (const exception& error)
+	catch (const std::exception& error)
 	{
-		cerr << error.what() << endl;
+		std::cerr << error.what() << std::endl;
 
 		return EXIT_FAILURE;
 	}
-	catch (const string& ExceptionMessage)
+	catch (const std::string& ExceptionMessage)
 	{
-		cerr << ExceptionMessage << endl;
+		std::cerr << ExceptionMessage << std::endl;
 
 		return EXIT_FAILURE;
 	}

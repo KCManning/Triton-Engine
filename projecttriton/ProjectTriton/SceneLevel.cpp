@@ -2,7 +2,7 @@
 #include "SceneLevel.h"
 
 using namespace Triton;
-using namespace std;
+using std::vector;
 
 Camera SceneLevel::camera;
 

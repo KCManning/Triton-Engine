@@ -2,7 +2,7 @@
 #include "Engine.h"
 
 using namespace Triton;
-using namespace std;
+//using namespace std;
 
 Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 {
@@ -22,7 +22,7 @@ Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 	// SDL must be initialized before this can be called
 	m_display.init(640, 480, "");
 
-	cout << "Start Up took " << SDL_GetTicks() - startTime << " milliseconds" << endl;
+	std::cout << "Start Up took " << SDL_GetTicks() - startTime << " milliseconds" << std::endl;
 }
 
 void Engine::update()
@@ -63,13 +63,13 @@ void Engine::loadGame(const char* GameFile)
 		Uint32 startOfLoadTime = SDL_GetTicks();
 		currentGame = new Game;
 		parse(GameFile, currentGame);
-		cout << "Game took " << SDL_GetTicks() - startOfLoadTime << " milliseconds to load" 
-			<< endl;
+		std::cout << "Game took " << SDL_GetTicks() - startOfLoadTime << " milliseconds to load"
+			<< std::endl;
 		inGame = true;
 	}
 	catch (const string& errorMessage)
 	{
-		cerr << "error occurred while loading game: " << errorMessage << endl;
+		std::cerr << "error occurred while loading game: " << errorMessage << std::endl;
 		delete currentGame;
 		currentGame = nullptr;
 	}

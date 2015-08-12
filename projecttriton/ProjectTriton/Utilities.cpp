@@ -8,7 +8,10 @@
 #include "Utilities.h"
 
 using namespace Triton;
-using namespace std;
+//using namespace std;
+using std::list;
+using std::string;
+using std::exception;
 
 using glm::vec2;
 using glm::vec3;
@@ -69,8 +72,8 @@ void Parser::clear()
 list<string> Triton::getTokensFromFile(const char* filepath)
 {
 	try{
-		ifstream file;
-		file.open(filepath, ifstream::in);
+		std::ifstream file;
+		file.open(filepath, std::ifstream::in);
 
 		string line;
 		list<string> tokens;
@@ -230,7 +233,7 @@ list<string> Triton::split(const string &data)
 					if (it != --data.cend())
 						token.push_back(*it);
 					else
-						throw out_of_range("no ending \" after a \"");
+						throw std::out_of_range("no ending \" after a \"");
 				}
 				// token needs to be pushed back even if it's empty in this case
 				output.push_back(token);
@@ -1208,8 +1211,8 @@ string Triton::parse(const char* filepath, Shader*& type)
 				string line;
 				string GLSLstrings = "";
 
-				ifstream file;
-				file.open((shaderDirectory + *(++it)).c_str(), ifstream::in);
+				std::ifstream file;
+				file.open((shaderDirectory + *(++it)).c_str(), std::ifstream::in);
 
 				while (file.good())
 				{
