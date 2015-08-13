@@ -2,7 +2,6 @@
 #include "Engine.h"
 
 using namespace Triton;
-//using namespace std;
 
 Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 {

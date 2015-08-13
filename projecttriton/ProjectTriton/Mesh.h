@@ -6,7 +6,6 @@
 
 #include <vector>
 
-//using namespace std;
 using glm::vec3;
 using glm::vec2;
 using glm::vec4;

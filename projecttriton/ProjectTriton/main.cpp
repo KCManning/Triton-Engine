@@ -6,7 +6,6 @@
 #include <vld.h>
 #include "Engine.h"
 
-//using namespace std;
 using namespace Triton;
 
 int main(int argc, char** argv)
