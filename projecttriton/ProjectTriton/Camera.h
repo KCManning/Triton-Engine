@@ -5,54 +5,57 @@
 #include "glm\glm.hpp"
 #include "glm\gtc\quaternion.hpp"
 #include "glm\gtx\transform.hpp"
+#include <string>
 
 using namespace glm;
-
 
 namespace Triton
 {
 	struct Camera
 	{
-		mat4 Projection;
-		mat4 View;
+		mat4 perspective;
 
-		vec3 Position;
-		// should be normalized
-		vec3 Up;
-		vec3 Forward;
-		vec3 LookDirection;
+		float fVel; //forward velocity
+		float uVel; //upward velocity
+		float lVel; //lateral velocity left and right
+		float camSpeed;
+		//glm::quat camRot;
+		float fov;
+		float screenWidth;
+		float screenHeight;
+		float aspect;
+		float zNear;
+		float zFar;
 
-		// x, y, z speeds, when camera is moving
-		vec3 moveVector;
-		quat rotationVector;
-
-		// stored for temporary input function
-		unsigned short ViewWidth;
-		unsigned short ViewHeight;
+		vec3 pos;
+		vec3 forward;
+		vec3 up;
 
 		// constructor
-		Camera(bool orthographic = false, unsigned short screenWidth = 640,
-			unsigned short screenHeight = 480, vec3 _position = vec3(0.f, 0.f, 4.f),
-			vec3 _up = vec3(0.f, 1.f, 0.f), vec3 _forward = vec3(0.f, 0.f, 1.f),
-			float field_of_view = 70.f, float nearClippingDistance = 0.1f, 
-			float farClippingDistance = 1000.f);
+		Camera();
 
-		// adjusts Project matrix
-		void setProjection(unsigned short screenWidth = 0, unsigned short screenHeight = 0, 
-			float field_of_view = 0.f, float nearClippingPlane = -1.f, 
-			float farClippingPlane = -1.f, bool orthographic = false);
+		void set(glm::vec3 npos, glm::vec3 nforward, glm::vec3 nup, float nfov,
+			float nwidth, float nheight, float nzNear, float nzFar);
 
-		vec3 Left(){ return cross(Forward, -Up); }
+		void input(SDL_Event &e);
 
-		vec3 Right(){ return cross(Forward, Up); }
-
-		// rotate with euler angles in radians
-		void Rotate(float euler_x, float euler_y, float euler_z);
-
-		// updates orientation vectors and matrices
 		void update();
 
-		// temporary
-		void input(SDL_Event& e);
+		vec3 getLeft()
+		{
+			return glm::cross(forward, -up);
+		}
+
+		vec3 getRight()
+		{
+			return glm::cross(forward, up);
+		}
+
+		mat4 getViewProjection() const
+		{
+			return perspective * lookAt(pos, pos + forward, up);
+		}
+
+		~Camera();
 	};
 }

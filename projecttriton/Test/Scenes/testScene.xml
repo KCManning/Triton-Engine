@@ -5,7 +5,7 @@
 		"phong.xml";
 	</shaders>
 	<meshes directory = "Models/">
-		"cube.xml";
+		"field.xml";
 	</meshes>
 	<textures directory = "Textures/">
 		"UVGrid.png", UVGrid;

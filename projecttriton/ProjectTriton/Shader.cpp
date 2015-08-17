@@ -87,6 +87,10 @@ void Shader::compile()
 	{
 		throw errorMessage;
 	}
+
+	bind();
+
+	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 }
 
 void Shader::bind()

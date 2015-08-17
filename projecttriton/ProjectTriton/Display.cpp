@@ -15,8 +15,8 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 	if (SDL_WasInit(SDL_INIT_VIDEO) != SDL_INIT_VIDEO)
 		throw "SDL_Video was not initialized for Display class.";
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 
 	// all of these return a zero or negative number on error
 	// size of each color channel for the frame buffer, essentialy amount of data for each pixel

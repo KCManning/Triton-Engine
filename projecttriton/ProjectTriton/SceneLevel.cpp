@@ -30,8 +30,8 @@ void SceneLevel::draw()
 
 		// Shader::active->uniforms[Shader::Uniforms::CAMERA] = glGetUniformLocation(Shader::active->handle, "camera");
 
-		// glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
-		// 	&camera.View[0][0]);
+		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
+		 	&camera.getViewProjection()[0][0]);
 		
 		(*it)->draw();
 	}
