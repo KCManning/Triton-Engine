@@ -39,6 +39,13 @@ void Texture::load(const char* textureFile)
 	glGenTextures(1, &handle);
 	// binds the texture for editting
 	glBindTexture(GL_TEXTURE_2D, handle);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	// fills the texture object with information from the pixels array
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempSurface->w, tempSurface->h, 0, GL_RGBA, 
 		GL_UNSIGNED_BYTE, pixels.data());
