@@ -140,11 +140,11 @@ void Camera::input(SDL_Event& e)
 
 void Camera::update()
 {
-	quat yaw = normalize(quat(rotationVector.w, 0.f, rotationVector.y, 0.f));
-	Forward = inverse(yaw) * Forward * yaw;
+	// quat yaw = normalize(quat(rotationVector.w, 0.f, rotationVector.y, 0.f));
+	// Forward = inverse(yaw) * Forward * yaw;
 
-	LookDirection = inverse(rotationVector) * LookDirection * rotationVector;
-	Position += (moveVector.x * Right()) + (moveVector.y * Up) + (moveVector.z * Forward);
+	// LookDirection = inverse(rotationVector) * LookDirection * rotationVector;
+	// Position += (moveVector.x * Right()) + (moveVector.y * Up) + (moveVector.z * Forward);
 
 	View = Projection * lookAt(Position, Position + LookDirection, Up);
 }

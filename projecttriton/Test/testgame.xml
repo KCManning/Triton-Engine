@@ -3,7 +3,7 @@
 	<!--settings-->
 	<window>
 		<resolution>
-			800, 600;
+			640, 480;
 		</resolution>
 		<fullscreen>
 		<!--

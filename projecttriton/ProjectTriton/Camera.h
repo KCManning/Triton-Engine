@@ -32,7 +32,7 @@ namespace Triton
 
 		// constructor
 		Camera(bool orthographic = false, unsigned short screenWidth = 640,
-			unsigned short screenHeight = 480, vec3 _position = vec3(0.f, 0.f, 0.f),
+			unsigned short screenHeight = 480, vec3 _position = vec3(0.f, 0.f, 4.f),
 			vec3 _up = vec3(0.f, 1.f, 0.f), vec3 _forward = vec3(0.f, 0.f, 1.f),
 			float field_of_view = 70.f, float nearClippingDistance = 0.1f, 
 			float farClippingDistance = 1000.f);

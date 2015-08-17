@@ -26,12 +26,12 @@ void SceneLevel::draw()
 {
 	for (vector<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
-		(*it)->material->bind();
+		// (*it)->material->bind();
 
-		Shader::active->uniforms[Shader::Uniforms::CAMERA] = glGetUniformLocation(Shader::active->handle, "camera");
+		// Shader::active->uniforms[Shader::Uniforms::CAMERA] = glGetUniformLocation(Shader::active->handle, "camera");
 
-		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
-			&camera.View[0][0]);
+		// glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
+		// 	&camera.View[0][0]);
 		
 		(*it)->draw();
 	}

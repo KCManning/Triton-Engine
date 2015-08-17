@@ -15,7 +15,7 @@ out vec3 worldPos0;
 
 void main()
 {
-	gl_Position = vec4(vertex, 1.0);
+	gl_Position = camera * vec4(vertex, 1.0);
 	normal0 = normal;
 	texCoord0 = UV;
 	worldPos0 = vertex;
