@@ -12,7 +12,7 @@ namespace Triton
 {
 	// helper function for Texture class that obtains the pixel information in an SDL Surface,
 	// at specified index in the pixel array
-	Uint32 getPixel(SDL_Surface* surface, int i);
+	Uint32 getPixel(SDL_Surface* surface, int x, int y);
 	
 	struct Texture
 	{

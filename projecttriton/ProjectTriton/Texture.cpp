@@ -18,21 +18,26 @@ void Texture::load(const char* textureFile)
 	// can reach over 64,000, the range of a short
 	unsigned int pixelDataCount = tempSurface->pitch * tempSurface->h;
 
+	int surfaceWidth = tempSurface->w;
+
 	// pixels = new unsigned char[pixelDataCount];
 	pixels.resize(pixelDataCount, 0);
 	// iterates through each pixel
-	for (int i = 0; i < tempSurface->w * tempSurface->h; ++i)
+	for (int y = 0; y < tempSurface->h; ++y)
 	{
-		unsigned char r, g, b, a;
+		for (int x = 0; x < surfaceWidth; ++x)
+		{
+			unsigned char r, g, b, a;
 
-		// gets the color information on the pixel and assigns them to the unsigned char values
-		SDL_GetRGBA(getPixel(tempSurface, i), tempSurface->format, &r, &g, &b, &a);
+			// gets the color information on the pixel and assigns them to the unsigned char values
+			SDL_GetRGBA(getPixel(tempSurface, x, y), tempSurface->format, &r, &g, &b, &a);
 
-		// copies the information of each pixel component into the pixel array
-		pixels[i * 4] = r;
-		pixels[i * 4 + 1] = g;
-		pixels[i * 4 + 2] = b;
-		pixels[i * 4 + 3] = a;
+			// copies the information of each pixel component into the pixel array
+			pixels[y * surfaceWidth + x * 4] = r;
+			pixels[y * surfaceWidth + x * 4 + 1] = g;
+			pixels[y * surfaceWidth + x * 4 + 2] = b;
+			pixels[y * surfaceWidth + x * 4 + 3] = a;
+		}
 	}
 
 	// generates a texture object in the openGL context
@@ -77,10 +82,12 @@ Texture::~Texture()
 	pixels.clear();
 }
 
-Uint32 Triton::getPixel(SDL_Surface* surface, int i)
+Uint32 Triton::getPixel(SDL_Surface* surface, int x, int y)
 {
+	
+	int bpp = surface->format->BytesPerPixel;
 	// converts pixel data to a Uint8
-	Uint8 * pixel = (Uint8 *)surface->pixels + i;
+	Uint8 * pixel = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
 	// depending on image formate, each pixel can be made of a different number of components
 	switch (surface->format->BytesPerPixel) {
