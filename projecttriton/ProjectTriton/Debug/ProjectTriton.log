@@ -1,5 +1,9 @@
-﻿Build started 8/10/2015 2:05:18 PM.
+﻿Build started 8/18/2015 9:04:41 AM.
+     1>Project "C:\Users\Kevin\Dropbox\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         ProjectTriton.vcxproj -> C:\Users\Kevin\Dropbox\Triton-Engine\projecttriton\Debug\ProjectTriton.exe
+     1>Done Building Project "C:\Users\Kevin\Dropbox\Triton-Engine\projecttriton\ProjectTriton\ProjectTriton.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.10
+Time Elapsed 00:00:00.35
