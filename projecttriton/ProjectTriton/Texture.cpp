@@ -19,11 +19,13 @@ void Texture::load(const char* textureFile)
 	unsigned int pixelDataCount = tempSurface->pitch * tempSurface->h;
 
 	int surfaceWidth = tempSurface->w;
+	int surfaceHeight = tempSurface->h;
+	int surfacePitch = tempSurface->pitch;
 
 	// pixels = new unsigned char[pixelDataCount];
 	pixels.resize(pixelDataCount, 0);
 	// iterates through each pixel
-	for (int y = 0; y < tempSurface->h; ++y)
+	for (int y = 0; y < surfaceHeight; ++y)
 	{
 		for (int x = 0; x < surfaceWidth; ++x)
 		{
@@ -33,10 +35,10 @@ void Texture::load(const char* textureFile)
 			SDL_GetRGBA(getPixel(tempSurface, x, y), tempSurface->format, &r, &g, &b, &a);
 
 			// copies the information of each pixel component into the pixel array
-			pixels[y * surfaceWidth + x * 4] = r;
-			pixels[y * surfaceWidth + x * 4 + 1] = g;
-			pixels[y * surfaceWidth + x * 4 + 2] = b;
-			pixels[y * surfaceWidth + x * 4 + 3] = a;
+			pixels[y * surfacePitch + x * 4] = r;
+			pixels[y * surfacePitch + x * 4 + 1] = g;
+			pixels[y * surfacePitch + x * 4 + 2] = b;
+			pixels[y * surfacePitch + x * 4 + 3] = a;
 		}
 	}
 
@@ -52,7 +54,7 @@ void Texture::load(const char* textureFile)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// fills the texture object with information from the pixels array
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempSurface->w, tempSurface->h, 0, GL_RGBA, 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surfaceWidth, surfaceHeight, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, pixels.data());
 
 	// releases the temporary SDL_surface from memory
