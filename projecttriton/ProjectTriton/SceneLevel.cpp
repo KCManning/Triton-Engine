@@ -24,6 +24,7 @@ void SceneLevel::update()
 
 void SceneLevel::draw()
 {
+	// naive draw loop
 	for (vector<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
 	{
 		(*it)->material->bind();

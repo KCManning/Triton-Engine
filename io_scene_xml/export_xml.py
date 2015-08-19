@@ -7,6 +7,7 @@ from math import radians, pi #just for pi, but radians in case it's needed later
 
 Matrix = mathutils.Matrix
 Vector = mathutils.Vector
+Euler = mathutils.Euler
 
 class XMLExporter: #the Exporter referenced in __init__.py
 	def __init__(self, Config, Context): #constructor called in __init__.py
@@ -18,7 +19,7 @@ class XMLExporter: #the Exporter referenced in __init__.py
 		self.ExportMatrix = Matrix()
 		self.frames_per_second = Context.scene.render.fps
 		self.frameBeforeExport = Context.scene.frame_current
-		#self.Context.scene.frame_set(0)
+		self.Context.scene.frame_set(0)
 		self.GenerateExportList()
 
 	def GenerateExportList(self): #fills ExportList with
@@ -180,8 +181,8 @@ class ExporterObject:
 			#		object.animation_data.use_nla = old_nla_setting
 					
 			#resetting nla stack settings after evaluation
-			for track in tracks_to_unmute_later:
-				track.mute = False	
+			#for track in tracks_to_unmute_later:
+			#	track.mute = False	
 				
 			Exporter.Context.scene.frame_set(Exporter.frameBeforeExport)
 
@@ -189,18 +190,18 @@ class ExporterObject:
 		strings = []
 	
 		#header
-		strings.append("<object type=\"%s\" name=\"%s\">" % (self.type, self.name))
+		strings.append("<%s id=\"%s\">" % (self.type, self.name))
 
-		#world_matrix
-		mat_strings = convert_matrix_to_strings(self.world_matrix, "world", "matrix is row major")
-		for string in mat_strings:
-			strings.append("\t%s" % (string))
-			
-		#local matrix
-		if(self.local_matrix is not None):
-			locmat_strings = convert_matrix_to_strings(self.local_matrix, "local", "matrix is row major", "", "", self.parent_name)
-			for string in locmat_strings:
-				strings.append("\t%s" % (string))
+		##world_matrix
+		#mat_strings = convert_matrix_to_strings(self.world_matrix, "world", "matrix is column major")
+		#for string in mat_strings:
+		#	strings.append("\t%s" % (string))
+		#	
+		##local matrix
+		#if(self.local_matrix is not None):
+		#	locmat_strings = convert_matrix_to_strings(self.local_matrix, "local", "matrix is column major", "", "", self.parent_name)
+		#	for string in locmat_strings:
+		#		strings.append("\t%s" % (string))
 				
 		return strings
 		
@@ -322,7 +323,7 @@ class ExporterMesh(ExporterObject): #Mesh to be Exported
 						self.normals.append(normal)
 					normalIndex = self.normals.index(normal)
 					normals.append(normalIndex)
-				if(Exporter.Config.ExportTangents):
+				if(Exporter.Config.ExportTangents and object.data.uv_layers.active):
 					#calculates a consistent perpendicular tangent to normal vector
 					if not Exporter.Config.ExportNormals:
 						tempMesh.calc_normals_split()
@@ -394,7 +395,7 @@ class ExporterMesh(ExporterObject): #Mesh to be Exported
 		#	strings.append(string) #strings should already be indented
 			
 		#footer, it's two lines, just add it at the end of the to_string of each child class
-		strings.append("</object>")
+		strings.append("</mesh>")
 		return strings
 	
 class ExporterFace: #class specifically for the ExporterMesh, nested classes don't work
@@ -412,34 +413,37 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 	def __init__(self, Exporter, object): #this class, the xml Exporter, the mesh object
 		ExporterObject.__init__(self, Exporter, object)
 		
-		self.bones = [] #defining feature of an armature
-		self.bone_names = []
+		#self.bones = [] #defining feature of an armature
+		#self.bone_names = []
 		self.rest_poses = [] #list of pose class objects representing the rest pose of each bone
 		self.poses = [] #list of quaternions representing animations per frame, relative to rest quaternion
 		
-		for bone in object.data.bones:
-			self.bones.append(bone.matrix_local)
-			self.bone_names.append(bone.name)
+		#for bone in object.data.bones:
+		#	self.bones.append(bone.matrix_local)
+		#	self.bone_names.append(bone.name)
 			
-		if(Exporter.Config.ExportPoses and (object.animation_data is not None)):
-			pose_position_before_export = object.data.pose_position * 1
-			if(Exporter.Config.ExportRestPose):
-				object.data.pose_position = 'REST'
-				for bone in object.data.bones:
-					nPose = Pose(bone.head_local, bone.matrix_local.to_quaternion(), bone.name)
-					self.rest_poses.append(nPose)
-					
+		pose_position_before_export = object.data.pose_position * 1
+		if(Exporter.Config.ExportRestPose):
+			object.data.pose_position = 'REST'
+			for bone in object.data.bones:
+				matrix = Matrix.Rotation(-pi/2, 4, 'X') * bone.matrix_local
+				#nPose = BonePose(bone.head_local, matrix.to_quaternion(), bone.name)
+				nPose = BonePose(matrix.to_translation(), matrix.to_quaternion(), bone.name)
+				self.rest_poses.append(nPose)
+		
+		if(Exporter.Config.ExportPoses and (object.animation_data is not None) and (object.pose_library is not None)):
 			object.data.pose_position = 'POSE'
 			action_before_export = None
 			if(object.animation_data):
-				action_before_export = object.animation_data.action.name * 1
+				if(object.animation_data.action):
+					action_before_export = object.animation_data.action.name * 1
 			object.animation_data.action = object.pose_library
 			
 			for i, pose_marker in enumerate(object.pose_library.pose_markers):
 				end_frame = 0
 				
 				if(i != len(object.pose_library.pose_markers) - 1):
-					end_frame = object.pose_library.pose_markers[i + 1].frame + 1
+					end_frame = object.pose_library.pose_markers[i + 1].frame
 				else:
 					end_frame = int(object.pose_library.frame_range.y) + 1
 					
@@ -450,10 +454,13 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 					old_matrix = None
 					for frame in range(pose_marker.frame, end_frame):
 						Exporter.Context.scene.frame_set(frame)
-						if(old_matrix != poseBone.matrix_basis):
-							animation_frame = AnimationFrame(frame - pose_marker.frame + 1, poseBone.matrix_basis.to_quaternion()) #just testing right now
+						if(old_matrix != poseBone.matrix):
+							matrix = Matrix.Rotation(-pi/2, 4, 'X') * poseBone.matrix #offsets have to be relative to armature
+							rmatrix = (Matrix.Rotation(-pi/2, 4, 'X') * poseBone.bone.matrix_local).inverted() * matrix; #rotation quaternions have to be relative to rest quaternion
+							#animation_frame = AnimationFrame(frame - pose_marker.frame + 1, matrix.to_quaternion(), poseBone.head - poseBone.bone.head_local) #just testing right now
+							animation_frame = AnimationFrame(frame - pose_marker.frame + 1, rmatrix.to_quaternion().normalized(), matrix.to_translation()) #- (Matrix.Rotation(-pi/2, 4, 'X') * poseBone.bone.matrix_local).to_translation())
 							animation.append(animation_frame)
-							old_matrix = poseBone.matrix_basis * 1
+							old_matrix = poseBone.matrix * 1
 						
 					if(len(animation) > 0):
 						nAnimation = ExporterAnimation(poseBone.name, animation, pose_marker.name, "pose")
@@ -461,8 +468,8 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 									
 			if(action_before_export):
 				object.animation_data.action = bpy.data.actions[action_before_export]
-			object.data.pose_position = pose_position_before_export
-			Exporter.Context.scene.frame_set(Exporter.frameBeforeExport)
+		object.data.pose_position = pose_position_before_export
+		Exporter.Context.scene.frame_set(0)
 		
 	def to_strings(self):
 		strings = [] #resulting string array
@@ -473,11 +480,11 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 			strings.append(string) #strings should already be indented
 			
 		#bone matrices
-		strings.append("\t<!--these matrices are relative to the armature-->")
-		for bone, name in zip(self.bones, self.bone_names):
-			bone_strings = convert_matrix_to_strings(bone, "bone", "", "", "", name)
-			for string in bone_strings:
-				strings.append("\t%s" % (string))
+		#strings.append("\t<!--these matrices are relative to the armature-->")
+		#for bone, name in zip(self.bones, self.bone_names):
+		#	bone_strings = convert_matrix_to_strings(bone, "bone", "", "", "", name)
+		#	for string in bone_strings:
+		#		strings.append("\t%s" % (string))
 				
 		#rest positions
 		#strings.append("\t<rest_pose>")
@@ -486,12 +493,15 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 		#	for string in rest_matrices:
 		#		strings.append("\t\t%s" % (string))
 		#strings.append("\t</rest_pose>")
-		for pose in rest_poses:
+		
+		strings.append("\t<!--quaternions and offsets are set in opengGL's native format, no need to multiply by space matrix-->")
+		
+		for pose in self.rest_poses:
 			pose_strings = pose.to_strings()
 			for string in pose_strings:
 				strings.append("\t%s" % (string))
 			
-				
+		
 		##calling animation_to_strings
 		#strings.append("\t<!--pose matrices are to be applied during the shader phase, they're the pose.bones.matrix_basis(es) in 2.75 version of blender,")
 		#strings.append("\t    unless you're doing ragdoll physics, in that case apply inverse_of_matrix_in_frame_before * matrix_of_current_frame to the")
@@ -507,7 +517,7 @@ class ExporterArmature(ExporterObject): #Armature to be Exported
 				strings.append("\t%s" % (string))
 			
 		#footer, it's two lines, just add it at the end of the to_string of each child class
-		strings.append("</object>")
+		strings.append("</armature>")
 		return strings
 		
 class BonePose:
@@ -518,19 +528,25 @@ class BonePose:
 		
 	def to_strings(self):
 		strings = []
-		strings.append("<rest_pose bone=\"%s\">" % (name))
-		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (offset.x, offset.y, offset.z, 0))
-		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (rotation.w, rotation.x, rotation.y, rotation.z))
+		strings.append("<rest_pose bone=\"%s\">" % (self.name))
+		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (self.offset.x, self.offset.y, self.offset.z, 0))
+		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (self.rotation.w, self.rotation.x, self.rotation.y, self.rotation.z))
 		strings.append("</rest_pose>")
 		return strings
 		
 class AnimationFrame:
-	def __init__(self, frame, transform_quat):
+	def __init__(self, frame, transform_quat, offset):
 		self.frame = frame
 		self.transform = transform_quat
+		self.offset = offset
 		
-	def to_string(self):
-		return ("%.6f, %.6f, %.6f, %.6f;" % (transform.w, transform.x, transform.y, transform.z))
+	def to_strings(self):
+		strings = []
+		strings.append("<pose_frame frame=\"%d\">" % (self.frame))
+		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (self.offset.x, self.offset.y, self.offset.z, 0))
+		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (self.transform.w, self.transform.x, self.transform.y, self.transform.z))
+		strings.append("</pose_frame>")
+		return strings
 		
 class ExporterAnimation:
 	#parameters: 	name of object, animation is for
@@ -554,7 +570,9 @@ class ExporterAnimation:
 			#frame_strings = convert_matrix_to_strings(frame, "animation_frame")
 			#for string in frame_strings:
 			#	strings.append("\t%s" % (string))
-			strings.append("\t%s" % (frame.tostring()))
+			frame_strings = frame.to_strings()
+			for string in frame_strings:
+				strings.append("\t%s" % (string))
 		
 		#footer
 		strings.append("</animation>")
@@ -563,6 +581,7 @@ class ExporterAnimation:
 class File:
 	def __init__(self, Filepath):
 		self.filepath = Filepath
+		print(Filepath)
 		self.File = None
 		self.IndentSize = 0
 		
@@ -604,7 +623,7 @@ def convert_matrix_to_strings(matrix, type, notes="", coordinateSystem="", upAxi
 		floats = []
 		for j in range(0, 4):
 			if(type == "animation_frame"):
-				floats.append(matrix.transform[j][i])
+				floats.append(matrix.transform[i][j])
 			else:
 				floats.append(matrix[j][i])
 		strings.append("\t%.6f, %.6f, %.6f, %.6f;" % (floats[0], floats[1], floats[2], floats[3]))
@@ -693,9 +712,9 @@ def convert_indices_to_strings(array, size):
 					strings.append(string)
 			#
 		else:
-			for index in element:
+			for i, index in enumerate(element):
 				string += ("%d" % (index))
-				if(element.index(index) != (len(element) - 1)):
+				if(i != (len(element) - 1)):
 					string += "/"
 			#
 			string += ";"

@@ -62,7 +62,7 @@ class ExportXML(bpy.types.Operator):
 	ExportTangents = BoolProperty(
 		name="Export Tangent Space",
 		description="Export normal tangents and bitangent_signs",
-		default=False)
+		default=True)
 
 	ApplyModifiers = BoolProperty(
 		name="Apply Modifiers",
@@ -85,10 +85,10 @@ class ExportXML(bpy.types.Operator):
 		default=True)
 		
 	ExportPoses = BoolProperty(
-		name="Export Poses",
+		name="Export Pose Libraries",
 		description="Cuts the active action in each bone into poses marked by pose_markers, "\
-			"must export Armature Bones too to work, otherwise poses won't be exported "\
-			"usually what you want to go with for multiple bone animations on one armature.",
+			"must export Armature Bones to work, otherwise poses won't be exported "\
+			"must have at least one action in pose_library and one pose marker to work",
 		default=True)
 
 	#ExportDefaultAnimations = BoolProperty(

@@ -218,5 +218,3 @@ FakesAssemblies/
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
-projecttriton/ProjectTriton.sdf
-projecttriton/ProjectTriton.v12.suo
