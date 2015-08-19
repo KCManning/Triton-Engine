@@ -64,7 +64,7 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
 	// specifies which faces are back and front, clockwise
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	// specifies which faces are culled
 	glCullFace(GL_BACK);
 	// enables face culling
