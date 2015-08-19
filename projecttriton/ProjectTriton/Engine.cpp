@@ -60,7 +60,10 @@ void Engine::update()
 
 	if (++framesPassed == 180)
 	{
-		cout << 1000.f / frameTime << " max FPS"<< endl;
+		if(frameTime != 0) 
+			cout << "Time to render one frame: " << frameTime << " millisecond(s)" << endl;
+		else
+			cout << "Time to render one frame: <1 millisecond(s)" << endl;
 		framesPassed = 0;
 	}
 }
