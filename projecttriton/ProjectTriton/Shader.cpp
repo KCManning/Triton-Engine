@@ -10,7 +10,7 @@ Shader* Shader::active = nullptr;
 
 Shader::Shader()
 {
-	handle = NULL;
+	handle = glCreateProgram();
 	for (unsigned short i = 0; i < UNIFORM_COUNT; ++i)
 		uniforms[i] = NULL;
 	for (unsigned short i = 0; i < SHADERTYPE_COUNT; ++i)
@@ -55,11 +55,6 @@ void Shader::addComponent(string& GLSLstrings, GLenum shaderType)
 	glAttachShader(handle, componentHandle);
 }
 
-void Shader::init()
-{
-	handle = glCreateProgram();
-}
-
 void Shader::compile()
 {
 	// binds the locations of these variables in the shader program to these attribute locations
@@ -87,16 +82,14 @@ void Shader::compile()
 	{
 		throw errorMessage;
 	}
-
-	bind();
-
-	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 }
 
 void Shader::bind()
 {
 	glUseProgram(handle);
 	active = this;
+
+	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 }
 
 Shader::~Shader()

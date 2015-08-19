@@ -60,9 +60,6 @@ namespace Triton
 		// default contructor
 		Shader();
 
-		// assign program handle to handle member
-		void init();
-
 		// compile shader program
 		void compile();
 

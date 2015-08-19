@@ -12,6 +12,6 @@ Material::Material()
 
 void Material::bind()
 {
-	// shader->bind();
+	shader->bind();
 	diffuse->bind();
 }

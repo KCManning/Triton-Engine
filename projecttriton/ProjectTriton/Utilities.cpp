@@ -1186,8 +1186,6 @@ string Triton::parse(const char* filepath, Shader*& type)
 
 		string shaderDirectory = parser.currentGameDirectory;
 
-		type->init();
-
 		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
 			if (*it == "id")
