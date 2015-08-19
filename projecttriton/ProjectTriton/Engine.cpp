@@ -2,6 +2,7 @@
 #include "Engine.h"
 
 using namespace Triton;
+using namespace std;
 
 Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 {
@@ -26,6 +27,8 @@ Engine::Engine() : Quit(false), inGame(false), currentGame(nullptr)
 
 void Engine::update()
 {
+	static unsigned short framesPassed = 0;
+	
 	// clear stuff on the buffer you are about to draw on
 	m_display.clear();
 	
@@ -53,6 +56,12 @@ void Engine::update()
 	if (float(frameTime) < 1000.f / 60)
 	{
 		SDL_Delay(Uint32(1000.f / 60 - frameTime));
+	}
+
+	if (++framesPassed == 180)
+	{
+		cout << 1000.f / frameTime << " max FPS"<< endl;
+		framesPassed = 0;
 	}
 }
 
