@@ -31,6 +31,7 @@ namespace Triton
 		enum Uniforms
 		{
 			CAMERA,
+			OBJECTPOS,
 			UNIFORM_COUNT
 		};
 

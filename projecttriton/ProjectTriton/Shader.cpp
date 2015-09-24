@@ -90,6 +90,7 @@ void Shader::bind()
 	active = this;
 
 	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
+	uniforms[OBJECTPOS] = glGetUniformLocation(handle, "objectPos");
 }
 
 Shader::~Shader()

@@ -32,6 +32,8 @@ void SceneLevel::draw()
 
 		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
 		 	&camera.getViewProjection()[0][0]);
+		glUniform3fv(Shader::active->uniforms[Shader::Uniforms::OBJECTPOS], 1, 
+			&(*it)->position[0]);
 		
 		(*it)->draw();
 	}

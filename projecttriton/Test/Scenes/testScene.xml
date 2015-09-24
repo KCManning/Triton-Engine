@@ -6,6 +6,7 @@
 	</shaders>
 	<meshes directory = "Models/">
 		"field.xml";
+		"cube.xml";
 	</meshes>
 	<textures directory = "Textures/">
 		"UVGrid.png", UVGrid;
@@ -36,6 +37,14 @@
 			<events>
 			</events>
 			-->
+		</object>
+		<object>
+			<file>
+				"testObject1.xml";
+			</file>
+			<position>
+				0.0, 5.0, 0.0;
+			</position>
 		</object>
 	</objects>
 	<!--not yet implemented--

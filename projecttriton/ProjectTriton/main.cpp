@@ -3,7 +3,7 @@
 // Engine will currently only support the loading of png files, see texture loading during scene
 // parse
 
-#include <vld.h>
+//#include <vld.h>
 #include "Engine.h"
 
 using namespace Triton;

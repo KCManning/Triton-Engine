@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mesh id="Cube">
+<mesh id="Cube1">
 	<vertices count="12">
 		1.000000, 1.000000, 0.000000;
 		1.000000, -1.000000, 0.000000;

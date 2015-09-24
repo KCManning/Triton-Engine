@@ -563,6 +563,15 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 									parser.currentScene->objects.back())]
 									= parser.currentScene->objects.size() - 1;
 							}
+							if (*it == "position")
+							{
+								float x, y, z;
+								x = stof(*(++it));
+								y = stof(*(++it));
+								z = stof(*(++it));
+								
+								parser.currentScene->objects.back()->position = vec3(x, y, z);
+							}
 						} // end while
 					}
 					else if (*it == "directory")
