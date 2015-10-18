@@ -18,7 +18,7 @@ namespace Triton
 		vec3 position;
 
 		Mesh* mesh;
-		// Armature* armature;
+		Armature* armature;
 		Material* material;
 
 		// mesh is manipulated and animated by this object, a copy of the object pointed by 

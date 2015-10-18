@@ -72,13 +72,13 @@ void Mesh::init()
 			glBufferData(GL_ARRAY_BUFFER, weights.size() * sizeof(weights[0]), &weights[0],
 				GL_STATIC_DRAW);
 			glEnableVertexAttribArray(Shader::Attribs::WEIGHTS);
-			glVertexAttribPointer(Shader::Attribs::WEIGHTS, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		
-			glBindBuffer(GL_ARRAY_BUFFER, vbo[GROUP_INDEX_BUFFER - skippedBuffers]);
-			glBufferData(GL_ARRAY_BUFFER, groups.size() * sizeof(groups[0]), &groups[0],
+			glVertexAttribPointer(Shader::Attribs::WEIGHTS, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, vbo[WEIGHT_INDEX_BUFFER - skippedBuffers]);
+			glBufferData(GL_ARRAY_BUFFER, weight_indices.size() * sizeof(weight_indices[0]), &weight_indices[0],
 				GL_STATIC_DRAW);
-			glEnableVertexAttribArray(Shader::Attribs::GROUPS);
-			glVertexAttribPointer(Shader::Attribs::GROUPS, 4, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
+			glEnableVertexAttribArray(Shader::Attribs::WEIGHT_INDICES);
+			glVertexAttribPointer(Shader::Attribs::WEIGHT_INDICES, 2, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
 		}
 		else
 			skippedBuffers += 2;
@@ -119,6 +119,5 @@ Mesh::~Mesh()
 	normals.clear();
 	tangents.clear();
 	weights.clear();
-	groups.clear();
 	indices.clear();
 }

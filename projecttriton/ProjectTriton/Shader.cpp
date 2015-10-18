@@ -63,7 +63,7 @@ void Shader::compile()
 	glBindAttribLocation(handle, NORMAL, "normal");
 	glBindAttribLocation(handle, TANGENT, "tangent");
 	glBindAttribLocation(handle, WEIGHTS, "weights");
-	glBindAttribLocation(handle, GROUPS, "groups");
+	glBindAttribLocation(handle, WEIGHT_INDICES, "weight_indices");
 	
 	glLinkProgram(handle);
 	try{
@@ -91,6 +91,10 @@ void Shader::bind()
 
 	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
 	uniforms[OBJECTPOS] = glGetUniformLocation(handle, "objectPos");
+	for (short i = 0; i < MAX_BONES; ++i)
+		uniforms[UNIFORM_COUNT + i] = glGetUniformLocation(handle, ("offsets[" + std::to_string(i) + "]").c_str());
+	for (short i = 0; i < MAX_BONES; ++i)
+		uniforms[UNIFORM_COUNT + MAX_BONES + i] = glGetUniformLocation(handle, ("rotations[" + std::to_string(i) + "]").c_str());
 }
 
 Shader::~Shader()

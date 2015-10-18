@@ -76,6 +76,7 @@ namespace Triton
 		// class's object array in the currentScene Object of the 
 		// currentGame
 		unordered_map<string, unsigned short> meshMap;
+		unordered_map<string, unsigned short> armatureMap;
 		unordered_map<string, unsigned short> objectMap;
 		unordered_map<string, unsigned short> materialMap;
 		unordered_map<string, unsigned short> textureMap;

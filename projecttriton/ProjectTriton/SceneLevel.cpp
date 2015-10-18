@@ -34,6 +34,26 @@ void SceneLevel::draw()
 		 	&camera.getViewProjection()[0][0]);
 		glUniform3fv(Shader::active->uniforms[Shader::Uniforms::OBJECTPOS], 1, 
 			&(*it)->position[0]);
+		for (unsigned short i = 0; i < (*it)->armature->boneCount; ++i)
+		{
+			glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + i], 1, 
+				&(*it)->armature->anims[i].offsets[(*it)->armature->currentFrame][0]);
+		}
+		for (unsigned short i = (*it)->armature->boneCount; i < MAX_BONES; ++i)
+		{
+			glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + i], 1,
+				&(*it)->armature->anims[i].offsets[(*it)->armature->currentFrame][0]);
+		}
+		for (unsigned short i = 0; i < (*it)->armature->boneCount; ++i)
+		{
+			glUniform4fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES + i], 1,
+				&(*it)->armature->anims[i].rotations[(*it)->armature->currentFrame][0]);
+		}
+		for (unsigned short i = (*it)->armature->boneCount; i < MAX_BONES; ++i)
+		{
+			glUniform4fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES + i], 1,
+				&(*it)->armature->anims[i].rotations[(*it)->armature->currentFrame][0]);
+		}
 		
 		(*it)->draw();
 	}

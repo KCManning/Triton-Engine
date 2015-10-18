@@ -472,6 +472,27 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 			}
 #pragma endregion
 
+#pragma region Armatures
+			if (*it == "armatures")
+			{
+				string armatureDirectory = parser.currentGameDirectory;
+
+				while (*(++it) != "/armatures")
+				{
+					if (*it != "directory")
+					{
+						parser.currentScene->armatures.emplace_back(nullptr);
+
+						parser.armatureMap[parse(
+							(armatureDirectory + *it).c_str(), parser.currentScene->armatures.back())]
+							= parser.currentScene->armatures.size() - 1;
+					}
+					else
+						armatureDirectory.append((*(++it)).c_str());
+				}
+			}
+#pragma endregion
+
 #pragma region Materials
 			else if (*it == "materials")
 			{
@@ -654,9 +675,8 @@ string Triton::parse(const char* filepath, Mesh*& type)
 	vector<vec3> vertices, normals, tangents;
 	vector<vec2> UVs;
 	vector<vector<short>> face_indices;
-	vector<float> weights;
-	vector<vector<unsigned short>> weight_indices;
-	unsigned short vertexGroupCount;
+	vector<vec2> weights;
+	vector<uvec2> weight_indices;
 	unsigned short indicesCount;
 	unsigned short verticesCount;
 
@@ -690,36 +710,35 @@ string Triton::parse(const char* filepath, Mesh*& type)
 				}
 			}
 
+#pragma endregion
+
 #pragma region Vertex_Weights
-			else if (*it == "vertex_groups")
-			{
-				advance(it, 2); // skips over "count" token
-				vertexGroupCount = stoi(*it);
-				advance(it, vertexGroupCount);
-			}
 			else if (*it == "weights")
 			{
 				advance(it, 2); // skips over "count" token
 				unsigned short count = stoi(*it);
+				
+				weights.resize(count);
+
 				for (unsigned short i = 0; i < count; ++i)
 				{
-					weights.push_back(stof(*(++it)));
+					weights[i].x = stof(*(++it));
+					weights[i].y = stof(*(++it));
 				}
 			}
-			else if (*it == "weights_indices")
+			else if (*it == "weight_indices")
 			{
 				advance(it, 2); // skips over "count" token
-				for (unsigned short i = 0; i < verticesCount; ++i)
+				unsigned short count = stoi(*it);
+
+				weight_indices.resize(count);
+
+				for (unsigned short i = 0; i < count; ++i)
 				{
-					weight_indices.push_back(vector<unsigned short>());
-					for (unsigned short j = 0; j < vertexGroupCount; ++j)
-					{
-						weight_indices[i].push_back(stoi(*(++it)));
-					}
+					weight_indices[i].x = stoi(*(++it));
+					weight_indices[i].y = stoi(*(++it));
 				}
 			}
-#pragma endregion
-
 #pragma endregion
 
 #pragma region UVs
@@ -776,7 +795,7 @@ string Triton::parse(const char* filepath, Mesh*& type)
 			else if (*it == "faces")
 			{
 				advance(it, 2); // skips over "count" token
-				indicesCount = stoi(*it) * 3;
+				indicesCount = stoi(*it);
 				unsigned short copyIndex = 0;
 				for (unsigned short i = 0; i < indicesCount; ++i)
 				{
@@ -833,16 +852,10 @@ string Triton::parse(const char* filepath, Mesh*& type)
 		{
 			if (face_indices[i][0] != -2)
 				type->vertices.push_back(vertices[face_indices[i][0]]);
+			if (!weights.empty())
+				type->weights.push_back(weights[face_indices[i][0]]);
 			if (!weight_indices.empty())
-			{
-				type->groups.push_back(uvec4(0));
-				type->weights.push_back(vec4(0.f));
-				for (unsigned short j = 0; j < vertexGroupCount; ++j)
-				{
-					type->groups[i][j] = j;
-					type->weights[i][j] = weights[weight_indices[face_indices[i][0]][j]];
-				}
-			}
+				type->weight_indices.push_back(weight_indices[face_indices[i][0]]);
 			if (face_indices[i][1] != -2)
 				type->UVs.push_back(UVs[face_indices[i][1]]);
 			if (face_indices[i][2] != -2)
@@ -851,15 +864,15 @@ string Triton::parse(const char* filepath, Mesh*& type)
 				type->tangents.emplace_back(tangents[face_indices[i][3]], (float)face_indices[i][4]);
 		}
 
+
 		type->init( // implement a form of vertex formatting later
 			);
 
-		vertices.clear();//** Also breaking here
+		vertices.clear();
 		normals.clear();
 		tangents.clear();
 		face_indices.clear();
 		weights.clear();
-		weight_indices.clear();
 
 		return id;
 	}
@@ -874,7 +887,6 @@ string Triton::parse(const char* filepath, Mesh*& type)
 		tangents.clear();
 		face_indices.clear();
 		weights.clear();
-		weight_indices.clear();
 		string errorMsg = e.what();
 		throw (errorMsg + "occured while reading file " + filepath);
 	}
@@ -888,7 +900,6 @@ string Triton::parse(const char* filepath, Mesh*& type)
 		tangents.clear();
 		face_indices.clear();
 		weights.clear();
-		weight_indices.clear();
 		throw errorMessage;
 	}
 #pragma endregion
@@ -961,6 +972,11 @@ string Triton::parse(const char* filepath, ObjectEntity*& type)
 			{
 				if (parser.materialMap.find(*(++it)) != parser.materialMap.cend())
 					type->material = parser.currentScene->materials[parser.materialMap[*it]];
+			}
+			else if (*it == "armature")
+			{
+				if (parser.armatureMap.find(*(++it)) != parser.armatureMap.cend())
+					type->armature = parser.currentScene->armatures[parser.armatureMap[*it]];
 			}
 		}
 		
@@ -1253,6 +1269,96 @@ string Triton::parse(const char* filepath, Shader*& type)
 		throw errorMessage;
 	}
 #pragma endregion
+}
+
+string Triton::parse(const char* filepath, Armature*& type)
+{
+	try{
+		list<string> tokens = getTokensFromFile(filepath);
+
+		type = new Armature;
+
+		string id;
+		short boneCount = 0;
+
+		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
+		{
+			if (*it == "id")
+			{
+				id = *(++it);
+			}
+			if (*it == "bone")
+			{
+				++it;
+				type->bones[boneCount].name = *(++it);
+				type->bones[boneCount].head.x = stof(*(++it));
+				type->bones[boneCount].head.y = stof(*(++it));
+				type->bones[boneCount++].head.z = stof(*(++it));
+			}
+			if (*it == "animation")
+			{
+				advance(it, 2);
+				type->endFrame = stoi(*it);
+
+				for (unsigned short i = 0; i < boneCount; ++i)
+				{
+					advance(it, 3);
+					type->anims[i].offsets.resize(type->endFrame);
+					type->anims[i].rotations.resize(type->endFrame);
+
+					for (unsigned short j = 0; j < type->endFrame; ++j)
+					{
+						type->anims[i].offsets[j].x = stof(*(++it));
+						type->anims[i].offsets[j].y = stof(*(++it));
+						type->anims[i].offsets[j].z = stof(*(++it));
+
+						type->anims[i].rotations[j].w = stof(*(++it));
+						type->anims[i].rotations[j].x = stof(*(++it));
+						type->anims[i].rotations[j].y = stof(*(++it));
+						type->anims[i].rotations[j].z = stof(*(++it));
+					}
+
+					++it;
+				}
+				for (unsigned short i = boneCount; i < MAX_BONES; ++i)
+				{
+					type->anims[i].offsets.resize(type->endFrame);
+					type->anims[i].rotations.resize(type->endFrame);
+
+					for (unsigned short j = 0; j < type->endFrame; ++j)
+					{
+						type->anims[i].offsets[j].x = 0.0;
+						type->anims[i].offsets[j].y = 0.0;
+						type->anims[i].offsets[j].z = 0.0;
+
+						type->anims[i].rotations[j].w = 0.0;
+						type->anims[i].rotations[j].x = 0.0;
+						type->anims[i].rotations[j].y = 0.0;
+						type->anims[i].rotations[j].z = 0.0;
+					}
+				}
+			}
+		}
+
+		type->boneCount = boneCount;
+
+		tokens.clear();
+
+		return id;
+	}
+	catch (const exception& e)
+	{
+		delete type;
+		type = nullptr;
+		string errorMsg = " occurred while reading file '";
+		throw (errorMsg + filepath + "' " + e.what());
+	}
+	catch (const string& errorMessage)
+	{
+		delete type;
+		type = nullptr;
+		throw errorMessage;
+	}
 }
 
 #pragma endregion

@@ -64,7 +64,7 @@
 		-0.000012, -1.000000, -0.000002;
 		-0.000000, 0.000000, -1.000000;;
 	</tangents>
-	<faces count="12">
+	<faces count="36">
 	<!--indices order: vertex/UV/normal/tangent/bitangent_sign, na means none, either not available or applicable, such as if not exported-->
 		1/0/0/0/1, 
 		2/1/0/0/1, 

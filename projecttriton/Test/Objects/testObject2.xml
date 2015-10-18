@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<object id="Test">
+<object id="Test2">
 	<mesh>
-		Cube;
+		Box;
 	</mesh>
+	<!--
 	<armature>
 		Armature;
 	</armature>
-	<!--
 	<idle_anim>
 		Pose;
 	</idle_anim>

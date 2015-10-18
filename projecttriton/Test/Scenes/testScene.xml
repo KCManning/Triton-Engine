@@ -5,9 +5,11 @@
 		"phong.xml";
 	</shaders>
 	<meshes directory = "Models/">
-		"field.xml";
-		"cube.xml";
+		"bend_Cube.xml";
 	</meshes>
+	<armatures directory = "Models/">
+		"bend_Armature.xml";
+	</armatures>
 	<textures directory = "Textures/">
 		"UVGrid.png", UVGrid;
 	</textures>
@@ -37,14 +39,6 @@
 			<events>
 			</events>
 			-->
-		</object>
-		<object>
-			<file>
-				"testObject1.xml";
-			</file>
-			<position>
-				0.0, 5.0, 0.0;
-			</position>
 		</object>
 	</objects>
 	<!--not yet implemented--

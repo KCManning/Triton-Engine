@@ -29,24 +29,24 @@ varying vec2 outUV;
 
 void main()	
 {	
-	//vec3 vertex0 = vec3(0.0, 0.0, 0.0);
-	//vec3 normal0 = vec3(0.0, 0.0, 0.0);
-	//vec3 tangent0 = vec3(0.0, 0.0, 0.0);
+	vec3 vertex0 = vec3(0.0, 0.0, 0.0);
+	vec3 normal0 = vec3(0.0, 0.0, 0.0);
+	vec3 tangent0 = vec3(0.0, 0.0, 0.0);
 	
-	//for(int i = 0; i < 4; ++i)
-	//{
-	//	vec4 conjugation = conjugate(rotations[groups[i]]);
-	//	vertex0 += (offsets[groups[i]] + (conjugation * (vertex - offsets[groups[i]]) * rotations[groups[i]].wxyz)) * weights[i];
-	//	normal0 += (conjugation * normal * rotations[groups[i]].wxyz) * weights[i];
-	//	tangent0 += (conjugation * tangent.xyz * rotations[groups[i]].wxyz) * weights[i];
-	//}
+	for(int i = 0; i < 4; ++i)
+	{
+		vec4 conjugation = conjugate(rotations[groups[i]]);
+		vertex0 += (offsets[groups[i]] + (conjugation * (vertex - offsets[groups[i]]) * rotations[groups[i]].wxyz)) * weights[i];
+		normal0 += (conjugation * normal * rotations[groups[i]].wxyz) * weights[i];
+		tangent0 += (conjugation * tangent.xyz * rotations[groups[i]].wxyz) * weights[i];
+	}
 	
-	//outUV = UV;
-	//outNormal = WVP * vec4(normal0, 0.0);
-	//outTangent = WVP * vec4(tangent0, 0.0);
-	//outBitangent = WVP * vec4(tangent.w * cross(normal0, tangent0), 0.0);
-	//outVertex = WVP * vec4(vertex0, 1.0);
-	//gl_Position = outVertex;
+	outUV = UV;
+	outNormal = WVP * vec4(normal0, 0.0);
+	outTangent = WVP * vec4(tangent0, 0.0);
+	outBitangent = WVP * vec4(tangent.w * cross(normal0, tangent0), 0.0);
+	outVertex = WVP * vec4(vertex0, 1.0);
+	gl_Position = outVertex;
 	
 	//temp vert shader
 	gl_Position = vec4(vertex, 1.0);

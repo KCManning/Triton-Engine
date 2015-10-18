@@ -8,8 +8,8 @@
 
 using glm::vec3;
 using glm::vec2;
+using glm::uvec2;
 using glm::vec4;
-using glm::uvec4;
 using std::vector;
 
 namespace Triton
@@ -25,7 +25,7 @@ namespace Triton
 			NORMAL_BUFFER,
 			TANGENT_BUFFER,
 			WEIGHT_BUFFER,
-			GROUP_INDEX_BUFFER,
+			WEIGHT_INDEX_BUFFER,
 			INDEX_BUFFER,
 			MAX_BUFFER_COUNT
 		};
@@ -43,8 +43,8 @@ namespace Triton
 	
 		// weights for, size of each element will be determined by the number 
 		// each vertex will be affected by a max of four bones
-		vector<vec4> weights;
-		vector<uvec4> groups;
+		vector<vec2> weights;
+		vector<vec2> weight_indices;
 	
 		// possibly a light group buffer?
 		// vector<vec4> lightGroup;
