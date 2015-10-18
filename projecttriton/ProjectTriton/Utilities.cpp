@@ -676,7 +676,7 @@ string Triton::parse(const char* filepath, Mesh*& type)
 	vector<vec2> UVs;
 	vector<vector<short>> face_indices;
 	vector<vec2> weights;
-	vector<uvec2> weight_indices;
+	vector<vec2> weight_indices;
 	unsigned short indicesCount;
 	unsigned short verticesCount;
 
@@ -735,8 +735,8 @@ string Triton::parse(const char* filepath, Mesh*& type)
 
 				for (unsigned short i = 0; i < count; ++i)
 				{
-					weight_indices[i].x = stoi(*(++it));
-					weight_indices[i].y = stoi(*(++it));
+					weight_indices[i].x = float(stoi(*(++it)));
+					weight_indices[i].y = float(stoi(*(++it)));
 				}
 			}
 #pragma endregion

@@ -2,7 +2,7 @@
 #pragma once
 #include "GL\glew.h"
 #define GLM_SWIZZLE
-#define MAX_BONES 80
+#define MAX_BONES 4
 
 #include <string>
 #include <list>

@@ -78,7 +78,7 @@ void Mesh::init()
 			glBufferData(GL_ARRAY_BUFFER, weight_indices.size() * sizeof(weight_indices[0]), &weight_indices[0],
 				GL_STATIC_DRAW);
 			glEnableVertexAttribArray(Shader::Attribs::WEIGHT_INDICES);
-			glVertexAttribPointer(Shader::Attribs::WEIGHT_INDICES, 2, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(Shader::Attribs::WEIGHT_INDICES, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 		else
 			skippedBuffers += 2;

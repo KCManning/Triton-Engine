@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #define MAX_BONE_CHILDREN 10
-#define MAX_BONES 80
+#define MAX_BONES 4
 
 using glm::vec3;
 using glm::quat;
