@@ -53,9 +53,9 @@ void Engine::update()
 
 	Uint32 frameTime = SDL_GetTicks() - frameStartTime;
 	
-	if (float(frameTime) < 1000.f / 60)
+	if (float(frameTime) < 1000.f / 30)
 	{
-		SDL_Delay(Uint32(1000.f / 60 - frameTime));
+		SDL_Delay(Uint32(1000.f / 30 - frameTime));
 	}
 
 	if (++framesPassed == 180)

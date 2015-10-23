@@ -43,8 +43,8 @@ namespace Triton
 	
 		// weights for, size of each element will be determined by the number 
 		// each vertex will be affected by a max of four bones
-		vector<vec2> weights;
-		vector<vec2> weight_indices;
+		vector<vec4> weights;
+		vector<vec4> weight_indices;
 	
 		// possibly a light group buffer?
 		// vector<vec4> lightGroup;

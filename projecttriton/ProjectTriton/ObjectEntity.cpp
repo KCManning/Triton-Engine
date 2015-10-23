@@ -17,7 +17,8 @@ void ObjectEntity::input(SDL_Event& e)
 
 void ObjectEntity::update()
 {
-	armature->play();
+	if (armature != nullptr)
+		armature->play();
 }
 
 void ObjectEntity::draw()

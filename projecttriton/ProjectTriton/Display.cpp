@@ -63,8 +63,8 @@ void Display::init(unsigned int screenWidth, unsigned int screenHeight, const ch
 	// clear color is set default to black in rgba format
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
-	// specifies which faces are back and front, counter clockwise
-	glFrontFace(GL_CCW);
+	// specifies which faces are back and front, clockwise
+	glFrontFace(GL_CW);
 	// specifies which faces are culled
 	glCullFace(GL_BACK);
 	// enables face culling

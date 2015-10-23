@@ -6,7 +6,8 @@
 #include <unordered_map>
 
 #define MAX_BONE_CHILDREN 10
-#define MAX_BONES 4
+#define MAX_BONES 20
+#define MAX_ANIMATIONS 4
 
 using glm::vec3;
 using glm::quat;
@@ -19,6 +20,7 @@ namespace Triton
 		string name;
 		// locations of bone's head and tail
 		vec3 head;
+		int parentIndex;
 		// vec3 tail;
 		// the root is zero, what level of the bone hierarchy
 		// short level;
@@ -33,6 +35,11 @@ namespace Triton
 		std::vector<vec3> offsets;
 		std::vector<quat> rotations;
 	};
+	struct FrameSet
+	{
+		unsigned short startFrame, endFrame;
+	};
+
 	// structure that contains information for mesh skin animations
 	class Armature
 	{
@@ -40,9 +47,12 @@ namespace Triton
 		Armature();
 		Bone bones[MAX_BONES];
 		Animation anims[MAX_BONES];
-		short boneCount;
-		short currentFrame = 0;
-		short endFrame = 0;
+		FrameSet frameSets[MAX_ANIMATIONS];
+		unsigned short frameSet = 0;
+		unsigned short boneCount = 0;
+		unsigned short currentFrame = 0;
+		unsigned short startFrame = 0;
+		unsigned short numberOfFrames = 0;
 		// Bone* root;
 		void play();
 	};

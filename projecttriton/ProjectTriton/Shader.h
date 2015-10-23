@@ -2,7 +2,7 @@
 #pragma once
 #include "GL\glew.h"
 #define GLM_SWIZZLE
-#define MAX_BONES 4
+#define MAX_BONES 20
 
 #include <string>
 #include <list>
@@ -67,7 +67,7 @@ namespace Triton
 		// sets this as the program openGL is currently using
 		void bind();
 
-		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*2];
+		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*3];
 	
 		// destructor
 		~Shader();

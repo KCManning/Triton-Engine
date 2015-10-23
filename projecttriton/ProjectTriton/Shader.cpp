@@ -11,7 +11,7 @@ Shader* Shader::active = nullptr;
 Shader::Shader()
 {
 	handle = glCreateProgram();
-	for (unsigned short i = 0; i < UNIFORM_COUNT; ++i)
+	for (unsigned short i = 0; i < UNIFORM_COUNT + MAX_BONES * 3; ++i)
 		uniforms[i] = NULL;
 	for (unsigned short i = 0; i < SHADERTYPE_COUNT; ++i)
 		m_components[i] = NULL;
@@ -95,6 +95,8 @@ void Shader::bind()
 		uniforms[UNIFORM_COUNT + i] = glGetUniformLocation(handle, ("offsets[" + std::to_string(i) + "]").c_str());
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
 		uniforms[UNIFORM_COUNT + MAX_BONES + i] = glGetUniformLocation(handle, ("rotations[" + std::to_string(i) + "]").c_str());
+	for (unsigned short i = 0; i < MAX_BONES; ++i)
+		uniforms[UNIFORM_COUNT + MAX_BONES*2 + i] = glGetUniformLocation(handle, ("parentIndices[" + std::to_string(i) + "]").c_str());
 }
 
 Shader::~Shader()

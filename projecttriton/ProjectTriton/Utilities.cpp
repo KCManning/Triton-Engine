@@ -675,8 +675,8 @@ string Triton::parse(const char* filepath, Mesh*& type)
 	vector<vec3> vertices, normals, tangents;
 	vector<vec2> UVs;
 	vector<vector<short>> face_indices;
-	vector<vec2> weights;
-	vector<vec2> weight_indices;
+	vector<vec4> weights;
+	vector<vec4> weight_indices;
 	unsigned short indicesCount;
 	unsigned short verticesCount;
 
@@ -722,8 +722,18 @@ string Triton::parse(const char* filepath, Mesh*& type)
 
 				for (unsigned short i = 0; i < count; ++i)
 				{
-					weights[i].x = stof(*(++it));
-					weights[i].y = stof(*(++it));
+					unsigned short weightCount = stoi(*(++it));
+					for (unsigned short j = 0; j < weightCount; ++j)
+					{
+						weights[i][j] = stof(*(++it));
+					}
+					if (weightCount < 4)
+					{
+						for (unsigned short j = weightCount; j < 4; ++j)
+						{
+							weights[i][j] = 0.f;
+						}
+					}
 				}
 			}
 			else if (*it == "weight_indices")
@@ -735,8 +745,18 @@ string Triton::parse(const char* filepath, Mesh*& type)
 
 				for (unsigned short i = 0; i < count; ++i)
 				{
-					weight_indices[i].x = float(stoi(*(++it)));
-					weight_indices[i].y = float(stoi(*(++it)));
+					unsigned short weightCount = stoi(*(++it));
+					for (unsigned short j = 0; j < weightCount; ++j)
+					{
+						weight_indices[i][j] = float(stoi(*(++it)));
+					}
+					if (weightCount < 4)
+					{
+						for (unsigned short j = weightCount; j < 4; ++j)
+						{
+							weight_indices[i][j] = 0.f;
+						}
+					}
 				}
 			}
 #pragma endregion
@@ -1293,20 +1313,21 @@ string Triton::parse(const char* filepath, Armature*& type)
 				type->bones[boneCount].name = *(++it);
 				type->bones[boneCount].head.x = stof(*(++it));
 				type->bones[boneCount].head.y = stof(*(++it));
-				type->bones[boneCount++].head.z = stof(*(++it));
+				type->bones[boneCount].head.z = stof(*(++it));
+				type->bones[boneCount++].parentIndex = stoi(*(++it));
 			}
 			if (*it == "animation")
 			{
 				advance(it, 2);
-				type->endFrame = stoi(*it);
+				type->numberOfFrames = stoi(*it);
 
 				for (unsigned short i = 0; i < boneCount; ++i)
 				{
 					advance(it, 3);
-					type->anims[i].offsets.resize(type->endFrame);
-					type->anims[i].rotations.resize(type->endFrame);
+					type->anims[i].offsets.resize(type->numberOfFrames);
+					type->anims[i].rotations.resize(type->numberOfFrames);
 
-					for (unsigned short j = 0; j < type->endFrame; ++j)
+					for (unsigned short j = 0; j < type->numberOfFrames; ++j)
 					{
 						type->anims[i].offsets[j].x = stof(*(++it));
 						type->anims[i].offsets[j].y = stof(*(++it));
@@ -1322,10 +1343,10 @@ string Triton::parse(const char* filepath, Armature*& type)
 				}
 				for (unsigned short i = boneCount; i < MAX_BONES; ++i)
 				{
-					type->anims[i].offsets.resize(type->endFrame);
-					type->anims[i].rotations.resize(type->endFrame);
+					type->anims[i].offsets.resize(type->numberOfFrames);
+					type->anims[i].rotations.resize(type->numberOfFrames);
 
-					for (unsigned short j = 0; j < type->endFrame; ++j)
+					for (unsigned short j = 0; j < type->numberOfFrames; ++j)
 					{
 						type->anims[i].offsets[j].x = 0.0;
 						type->anims[i].offsets[j].y = 0.0;
