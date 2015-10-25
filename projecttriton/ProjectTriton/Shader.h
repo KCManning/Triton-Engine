@@ -67,7 +67,7 @@ namespace Triton
 		// sets this as the program openGL is currently using
 		void bind();
 
-		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*3];
+		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*5];
 	
 		// destructor
 		~Shader();

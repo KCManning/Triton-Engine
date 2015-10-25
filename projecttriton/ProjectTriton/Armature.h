@@ -34,6 +34,7 @@ namespace Triton
 		// aligned with Armature::bones
 		std::vector<vec3> offsets;
 		std::vector<quat> rotations;
+		std::vector<vec3> scales;
 	};
 	struct FrameSet
 	{

@@ -30,6 +30,8 @@ void SceneLevel::draw()
 		(*it)->material->bind();
 		// Shader::active->uniforms[Shader::Uniforms::CAMERA] = glGetUniformLocation(Shader::active->handle, "camera");
 
+		vec3 empty = vec3();
+
 		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
 		 	&camera.getViewProjection()[0][0]);
 		glUniform3fv(Shader::active->uniforms[Shader::Uniforms::OBJECTPOS], 1, 
@@ -64,7 +66,27 @@ void SceneLevel::draw()
 			for (unsigned short i = (*it)->armature->boneCount; i < MAX_BONES; ++i)
 			{
 				glUniform1i(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 2 + i],
-					-1);
+					-2);
+			}
+			for (unsigned short i = 0; i < (*it)->armature->boneCount; ++i)
+			{
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 3 + i], 1,
+					&(*it)->armature->bones[i].head[0]);
+			}
+			for (unsigned short i = (*it)->armature->boneCount; i < MAX_BONES; ++i)
+			{
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 3 + i], 1,
+					&empty[0]);
+			}
+			for (unsigned short i = 0; i < (*it)->armature->boneCount; ++i)
+			{
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 4 + i], 1,
+					&(*it)->armature->anims[i].scales[(*it)->armature->currentFrame][0]);
+			}
+			for (unsigned short i = (*it)->armature->boneCount; i < MAX_BONES; ++i)
+			{
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 4 + i], 1,
+					&(*it)->armature->anims[i].scales[(*it)->armature->currentFrame][0]);
 			}
 		}
 		

@@ -1326,6 +1326,7 @@ string Triton::parse(const char* filepath, Armature*& type)
 					advance(it, 3);
 					type->anims[i].offsets.resize(type->numberOfFrames);
 					type->anims[i].rotations.resize(type->numberOfFrames);
+					type->anims[i].scales.resize(type->numberOfFrames);
 
 					for (unsigned short j = 0; j < type->numberOfFrames; ++j)
 					{
@@ -1337,6 +1338,10 @@ string Triton::parse(const char* filepath, Armature*& type)
 						type->anims[i].rotations[j].x = stof(*(++it));
 						type->anims[i].rotations[j].y = stof(*(++it));
 						type->anims[i].rotations[j].z = stof(*(++it));
+
+						type->anims[i].scales[j].x = stof(*(++it));
+						type->anims[i].scales[j].y = stof(*(++it));
+						type->anims[i].scales[j].z = stof(*(++it));
 					}
 
 					++it;
@@ -1345,6 +1350,7 @@ string Triton::parse(const char* filepath, Armature*& type)
 				{
 					type->anims[i].offsets.resize(type->numberOfFrames);
 					type->anims[i].rotations.resize(type->numberOfFrames);
+					type->anims[i].scales.resize(type->numberOfFrames);
 
 					for (unsigned short j = 0; j < type->numberOfFrames; ++j)
 					{
@@ -1356,6 +1362,10 @@ string Triton::parse(const char* filepath, Armature*& type)
 						type->anims[i].rotations[j].x = 0.0;
 						type->anims[i].rotations[j].y = 0.0;
 						type->anims[i].rotations[j].z = 0.0;
+
+						type->anims[i].scales[j].x = 1.0;
+						type->anims[i].scales[j].y = 1.0;
+						type->anims[i].scales[j].z = 1.0;
 					}
 				}
 			}
