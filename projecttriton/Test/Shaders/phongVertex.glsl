@@ -79,26 +79,26 @@ void main()
 		b[i] = bonePos[index[i]];
 	}
 	
-	vec4 nVertex0 = vec4(vertex//- t[0] - b[0]
-	, 0.0);
-	vec4 nVertex1 = vec4(vertex// - t[1] - b[1]
-	, 0.0);
-	vec4 nVertex2 = vec4(vertex// - t[2] - b[2]
-	, 0.0);
-	vec4 nVertex3 = vec4(vertex// - t[3] - b[3]
+	vec4 nVertex0 = vec4(vertex - b[0]// - t[0]
+	, 0.0);                          
+	vec4 nVertex1 = vec4(vertex - b[1]// - t[1]
+	, 0.0);                           
+	vec4 nVertex2 = vec4(vertex - b[2]// - t[2]
+	, 0.0);                           
+	vec4 nVertex3 = vec4(vertex - b[3]// - t[3]
 	, 0.0);
 	vec4 nNormal0 = vec4(normal, 0.0);
 	vec4 nNormal1 = vec4(normal, 0.0);
 	vec4 nNormal2 = vec4(normal, 0.0);
 	vec4 nNormal3 = vec4(normal, 0.0);
 	
-	nVertex0 = ((boneMat[0] * nVertex0)// + vec4(t[0] + b[0], 0.0)
+	nVertex0 = ((boneMat[0] * nVertex0) + vec4(b[0], 0.0)
 	) * weights.x;
-	nVertex1 = ((boneMat[1] * nVertex1)// + vec4(t[1] + b[1], 0.0)
+	nVertex1 = ((boneMat[1] * nVertex1) + vec4(b[1], 0.0)
 	) * weights.y;
-	nVertex2 = ((boneMat[2] * nVertex2)// + vec4(t[2] + b[2], 0.0)
+	nVertex2 = ((boneMat[2] * nVertex2) + vec4(b[2], 0.0)
 	) * weights.z;
-	nVertex3 = ((boneMat[3] * nVertex3)// + vec4(t[3] + b[3], 0.0)
+	nVertex3 = ((boneMat[3] * nVertex3) + vec4(b[3], 0.0)
 	) * weights.w;
 	nNormal0 = (boneMat[0] * nNormal0) * weights.x;
 	nNormal1 = (boneMat[1] * nNormal1) * weights.y;
@@ -134,8 +134,8 @@ void main()
 	//	for (int j = 0; j < MAX_BONES - 1; ++j)
 	//	{
 	//		boneChain[j + 1] = pIndex;
+	//		boneCount += int(step(float(-1), float(pIndex)));
 	//		pIndex = parentIndices[pIndex];
-	//		++boneCount;
 	//	}
 	//	
 	//	nVertex[i] = vec4(vertex, 0.0);
