@@ -32,14 +32,23 @@ vec4 format(vec4 quat)
 	return vec4(quat.x, quat.y, quat.z, quat.w);
 }
 
-mat4 quatToMatrix(vec4 q0)
+mat4 quatToMatrix(vec4 q0, vec3 t0, vec3 s0)
 {
 	return mat4(
-	1.0 - 2.0*q0.y*q0.y - 2.0*q0.z*q0.z, 	2.0*q0.x*q0.y - 2.0*q0.z*q0.w, 			2.0*q0.x*q0.z + 2.0*q0.y*q0.w, 			0.0,
-	2.0*q0.x*q0.y + 2.0*q0.z*q0.w, 			1.0 - 2.0*q0.x*q0.x - 2.0*q0.z*q0.z, 	2.0*q0.y*q0.z - 2.0*q0.x*q0.w, 			0.0,
-	2.0*q0.x*q0.z - 2.0*q0.y*q0.w, 			2.0*q0.y*q0.z + 2.0*q0.x*q0.w, 			1.0 - 2.0*q0.x*q0.x - 2.0*q0.y*q0.y, 	0.0,
-	0.0, 								0.0, 								0.0, 								1.0);
+	s0.x*(1.0 - 2.0*q0.y*q0.y - 2.0*q0.z*q0.z), 	2.0*q0.x*q0.y - 2.0*q0.z*q0.w, 				2.0*q0.x*q0.z + 2.0*q0.y*q0.w, 				0.0,
+	2.0*q0.x*q0.y + 2.0*q0.z*q0.w, 				s0.y*(1.0 - 2.0*q0.x*q0.x - 2.0*q0.z*q0.z), 	2.0*q0.y*q0.z - 2.0*q0.x*q0.w, 				0.0,
+	2.0*q0.x*q0.z - 2.0*q0.y*q0.w, 				2.0*q0.y*q0.z + 2.0*q0.x*q0.w, 				s0.z*(1.0 - 2.0*q0.x*q0.x - 2.0*q0.y*q0.y), 	0.0,
+	t0.x, 									t0.y, 									t0.z, 									1.0);
 }
+
+//mat4 quatToMatrix(vec4 q0, vec3 t0, vec3 s0)
+//{
+//	return mat4(
+//	(1.0 - 2.0*q0.y*q0.y - 2.0*q0.z*q0.z), 	2.0*q0.x*q0.y - 2.0*q0.z*q0.w, 			2.0*q0.x*q0.z + 2.0*q0.y*q0.w, 			0.0,
+//	2.0*q0.x*q0.y + 2.0*q0.z*q0.w, 			(1.0 - 2.0*q0.x*q0.x - 2.0*q0.z*q0.z), 	2.0*q0.y*q0.z - 2.0*q0.x*q0.w, 			0.0,
+//	2.0*q0.x*q0.z - 2.0*q0.y*q0.w, 			2.0*q0.y*q0.z + 2.0*q0.x*q0.w, 			(1.0 - 2.0*q0.x*q0.x - 2.0*q0.y*q0.y), 	0.0,
+//	t0.x, 								t0.y, 								t0.z, 								1.0);
+//}
 
 void main()
 {
@@ -59,7 +68,7 @@ void main()
 	
 	for (int i = 0; i < MAX_BONES; ++i)
 	{
-		boneMat[i] = quatToMatrix(format(rotations[i]));
+		boneMat[i] = quatToMatrix(format(rotations[i]), offsets[i], scales[i]);
 	}
 	
 	vec4 nVertex[4];
@@ -69,16 +78,20 @@ void main()
 	
 	for(int i = 0; i < 4; ++i)
 	{
-		nVertex[i] = vec4(vertex, 0.0);
+		nVertex[i] = vec4(vertex, 1.0);
 		nNormal[i] = vec4(normal, 0.0);
 		
 		vec4 bone_offset = vec4(bonePos[index[i]], 0.0);
 		nVertex[i] -= bone_offset;
+		//nVertex[i].x *= scales[index[i]].x;
+		//nVertex[i].y *= scales[index[i]].z;
+		//nVertex[i].z *= scales[index[i]].y;
 		nVertex[i] = boneMat[index[i]] * nVertex[i];
 		nNormal[i] = boneMat[index[i]] * nNormal[i];
 		nVertex[i] += bone_offset;
 		
 		int pIndex = parentIndices[index[i]];
+		// might want to change this
 		while(pIndex > -1)//pIndex would be -1 for any bone without a parent and -2 for bones that don't exist
 		{
 			vec4 bone_offset = vec4(bonePos[pIndex], 0.0);

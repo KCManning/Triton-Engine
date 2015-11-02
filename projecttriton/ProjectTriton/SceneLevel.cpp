@@ -16,7 +16,7 @@ void SceneLevel::update()
 	// camera->update();
 	camera.update();
 
-	for (vector<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.end(); ++it)
+	for (vector<ObjectEntity*>::const_iterator it = objects.cbegin(); it != objects.cend(); ++it)
 	{
 		(*it)->update();
 	}

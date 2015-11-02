@@ -18,8 +18,12 @@ class XMLExporter: #the Exporter referenced in __init__.py
 		self.frameBeforeExport = Context.scene.frame_current
 		self.activeBeforeExport = Context.active_object
 		self.Context.scene.frame_set(0)
-		bpy.ops.object.mode_set(mode='OBJECT')
-					
+		self.modeBeforeExport = self.Context.scene.objects.active.mode
+		self.selectedBeforeExport = self.Context.selected_objects
+		bpy.ops.object.mode_set(mode='OBJECT')#
+		bpy.ops.object.select_all(action='DESELECT')#
+		Context.scene.objects.active = None#
+	
 	def Export(self): #export function called in __init__.py, writes to the XML File
 		if(self.Config.CoordinateSystem == 'LEFT_HANDED'):
 			self.ExportMatrix *= Matrix.Scale(-1, 4, Vector((1, 0, 0)))
@@ -35,9 +39,15 @@ class XMLExporter: #the Exporter referenced in __init__.py
 				ExportArmature(object, "%s_%s.xml" % (self.Config.filepath[:-4], object.name), self.ExportMatrix, self.Context.scene)
 		
 		self.Context.scene.frame_set(self.frameBeforeExport)
+		for object in self.selectedBeforeExport:
+			object.select = True
 		self.Context.scene.objects.active = self.activeBeforeExport
+		bpy.ops.object.mode_set(mode=self.modeBeforeExport)
+		self.Context.scene.update()
 
 def ExportMesh(mesh, filepath, exporttangents, matrix, scene_context):
+	scene_context.objects.active = mesh
+	mesh.select = True
 	bpy.ops.object.mode_set(mode='OBJECT')
 	vertices = []
 	UVs = []
@@ -49,9 +59,9 @@ def ExportMesh(mesh, filepath, exporttangents, matrix, scene_context):
 	weight_indices = []
 	
 	if(mesh.data.uv_layers.active is None):
-		scene_context.objects.active = mesh
 		bpy.ops.object.editmode_toggle()
 		bpy.ops.uv.smart_project()
+		bpy.ops.object.editmode_toggle()
 	
 	tempMesh = mesh.to_mesh(scene_context, True, 'PREVIEW')
 	bm = bmesh.new()
@@ -185,6 +195,10 @@ def ExportMesh(mesh, filepath, exporttangents, matrix, scene_context):
 	
 	del tempMesh
 	
+	bpy.ops.object.mode_set(mode='OBJECT')
+	mesh.select = False
+	scene_context.objects.active = None
+	
 def WriteVertexAttributes(file, element_type, elements):
 	file.Write("<%s count=\"%d\">" % (element_type, len(elements)))
 	file.Indent()
@@ -200,6 +214,8 @@ def WriteVertexAttributes(file, element_type, elements):
 	
 def ExportArmature(armature, filepath, matrix, scene_context):
 	scene_context.objects.active = armature
+	armature.select = True
+	bpy.ops.object.mode_set(mode='OBJECT')
 	armature.matrix_world = armature.matrix_world * matrix
 	bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 	
@@ -234,56 +250,62 @@ def ExportArmature(armature, filepath, matrix, scene_context):
 	ArmatureFile.Indent()
 		
 	bpy.ops.object.mode_set(mode='POSE')
-
-	for abone in armature.data.bones:
-		bone = armature.pose.bones[abone.name]
+	
+	for bone in armature.pose.bones:
 		ArmatureFile.Write("<bone id=\"%s\">" % (bone.name))
 		ArmatureFile.Indent()
-		
-		OldRotation = None;
 		
 		for frame in range(scene_context.frame_start, scene_context.frame_end + 1):
 			scene_context.frame_set(frame)
 			
 			final_rot_matrix = None
-			local_matrix = bone.matrix_channel.to_3x3()
+			local_matrix = bone.matrix_channel
 			if bone.parent is None:
 				final_rot_matrix = local_matrix
 			else:
-				final_rot_matrix = bone.parent.matrix_channel.to_3x3().inverted() * local_matrix
-				#final_rot_matrix = local_matrix
+				final_rot_matrix = bone.parent.matrix_channel.inverted() * local_matrix
 				
 			final_rotation = final_rot_matrix.to_quaternion()
 			
-			if(OldRotation is not None):
-				if(final_rotation.dot(OldRotation) < 0):
-					final_rotation.normalize()
-					final_rotation.negate()
-					
-			OldRotation = final_rotation
-			
-			final_rotation.y = -final_rotation.y
-			switchZ = final_rotation.y
-			switchY = final_rotation.z
+			switchZ = -final_rotation.y * 1
+			switchY = -final_rotation.z * 1
 			final_rotation.y = switchY
 			final_rotation.z = switchZ
 			
-			final_tranlation = bone.bone.matrix_local.to_translation()
-			final_scale = bone.matrix_channel.to_scale()
+			final_rotation.normalize()
+			
+			final_tranlation = Vector((0.0, 0.0, 0.0))
+			
+			final_tranlation += bone.location.x * bone.x_axis
+			final_tranlation += bone.location.y * bone.y_axis
+			final_tranlation += bone.location.z * bone.z_axis
+			
+			switchY = final_tranlation.z * 1
+			switchZ = final_tranlation.y * 1
+			final_tranlation.x = -final_tranlation.x
+			final_tranlation.y = switchY
+			final_tranlation.z = switchZ
+			
+			final_scale = final_rot_matrix.to_scale()
+			
+			switchY = final_scale.z * 1
+			switchZ = final_scale.y * 1
+			final_scale.y = switchY
+			final_scale.z = switchZ
 			
 			string = ""
 			for element in final_tranlation:
-				string += ("%.6f, " % (element))
+				string += ("%.5f, " % (element))
 			ArmatureFile.Write(string[:-2] + ";")
 			
 			string = ""
 			for element in final_rotation:
-				string += ("%.6f, " % (element))
+				string += ("%.4f, " % (element))
 			ArmatureFile.Write(string[:-2] + ";")
 			
 			string = ""
 			for element in final_scale:
-				string += ("%.6f, " % (element))
+				string += ("%.5f, " % (element))
 			ArmatureFile.Write(string[:-2] + ";")
 		
 		ArmatureFile.Unindent()
@@ -295,6 +317,8 @@ def ExportArmature(armature, filepath, matrix, scene_context):
 	ArmatureFile.Close()
 	
 	bpy.ops.object.mode_set(mode='OBJECT')
+	armature.select = False
+	scene_context.objects.active = None
 	scene_context.frame_set(0)
 		
 class File:

@@ -1320,6 +1320,8 @@ string Triton::parse(const char* filepath, Armature*& type)
 			{
 				advance(it, 2);
 				type->numberOfFrames = stoi(*it);
+				type->frameSets[0].startFrame = 0;
+				type->frameSets[0].endFrame = type->numberOfFrames - 1;
 
 				for (unsigned short i = 0; i < boneCount; ++i)
 				{
