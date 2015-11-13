@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mesh id="Cube">
+<mesh id="Field">
 	<vertices count="8">
 		4.613564, -1.285297, -4.613564;
 		4.613564, -1.485297, -4.613564;

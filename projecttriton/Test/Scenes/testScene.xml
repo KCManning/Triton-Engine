@@ -6,6 +6,7 @@
 	</shaders>
 	<meshes directory = "Models/">
 		"bend_Cube.xml";
+		"field_Cube.xml"
 	</meshes>
 	<armatures directory = "Models/">
 		"bend_Armature.xml";
@@ -26,6 +27,12 @@
 			<!--object files can only contain one object-->
 			<file>
 				"testObject.xml";
+			</file>
+			<position>
+				0.0, 0.0, 0.0;
+			</position>
+			<file>
+				"testObject1.xml";
 			</file>
 			<position>
 				0.0, 0.0, 0.0;

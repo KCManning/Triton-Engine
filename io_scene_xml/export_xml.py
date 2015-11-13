@@ -150,9 +150,13 @@ def ExportMesh(mesh, filepath, exporttangents, matrix, scene_context):
 	
 	for element in vertex_weights:
 		string = ""
+		count = len(element)
 		for sub_element in element:
 			string += ("%.6f, " % (sub_element))
-		MeshFile.Write(("%d, " % (len(element))) + string[:-2] + ";")
+		if count == 0:
+			string += ("%.6f, " % (1.000000))
+			count = 1
+		MeshFile.Write(("%d, " % (count)) + string[:-2] + ";")
 	
 	MeshFile.Unindent()
 	MeshFile.Write("</weights>")
@@ -162,9 +166,13 @@ def ExportMesh(mesh, filepath, exporttangents, matrix, scene_context):
 	
 	for element in weight_indices:
 		string = ""
+		count = len(element)
 		for sub_element in element:
 			string += ("%d/" % (sub_element))
-		MeshFile.Write(("%d, " % (len(element))) + string[:-1] + ";")
+		if count == 0:
+			string += ("%d/" % (0))
+			count = 1
+		MeshFile.Write(("%d, " % (count)) + string[:-1] + ";")
 	
 	MeshFile.Unindent()
 	MeshFile.Write("</weight_indices>")

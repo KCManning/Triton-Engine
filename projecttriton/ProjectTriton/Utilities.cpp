@@ -490,6 +490,12 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 					else
 						armatureDirectory.append((*(++it)).c_str());
 				}
+
+				parser.currentScene->armatures.emplace_back(nullptr);
+
+				parser.armatureMap[parse(
+					(armatureDirectory + "emptyBone.xml").c_str(), parser.currentScene->armatures.back())]
+					= parser.currentScene->armatures.size() - 1;
 			}
 #pragma endregion
 
@@ -975,6 +981,10 @@ string Triton::parse(const char* filepath, ObjectEntity*& type)
 
 		type = new ObjectEntity;
 
+		type->mesh = nullptr;
+		type->armature = nullptr;
+		type->material = nullptr;
+
 		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
 			if (*it == "id")
@@ -998,6 +1008,11 @@ string Triton::parse(const char* filepath, ObjectEntity*& type)
 				if (parser.armatureMap.find(*(++it)) != parser.armatureMap.cend())
 					type->armature = parser.currentScene->armatures[parser.armatureMap[*it]];
 			}
+		}
+
+		if (type->armature == nullptr)
+		{
+			type->armature = parser.currentScene->armatures[parser.armatureMap["Empty"]];
 		}
 		
 		tokens.clear();
@@ -1299,7 +1314,7 @@ string Triton::parse(const char* filepath, Armature*& type)
 		type = new Armature;
 
 		string id;
-		short boneCount = 0;
+		unsigned short boneCount = 0;
 
 		for (list<string>::const_iterator it = tokens.cbegin(); it != tokens.cend(); ++it)
 		{
@@ -1320,8 +1335,6 @@ string Triton::parse(const char* filepath, Armature*& type)
 			{
 				advance(it, 2);
 				type->numberOfFrames = stoi(*it);
-				type->frameSets[0].startFrame = 0;
-				type->frameSets[0].endFrame = type->numberOfFrames - 1;
 
 				for (unsigned short i = 0; i < boneCount; ++i)
 				{
@@ -1369,6 +1382,22 @@ string Triton::parse(const char* filepath, Armature*& type)
 						type->anims[i].scales[j].y = 1.0;
 						type->anims[i].scales[j].z = 1.0;
 					}
+				}
+			}
+			if (*it == "poses")
+			{
+				advance(it, 2);
+				unsigned short poseCount = stoi(*it);
+				type->animCount = poseCount;
+				for (unsigned short i = 0; i < poseCount; ++i)
+				{
+					type->frameSets[i].startFrame = stoi(*(++it));
+					type->frameSets[i].endFrame = stoi(*(++it));
+				}
+				for (unsigned short i = poseCount; i < MAX_ANIMATIONS; ++i)
+				{
+					type->frameSets[i].startFrame = 0;
+					type->frameSets[i].endFrame = 0;
 				}
 			}
 		}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<armature id="Empty">
+	<bone id="Bone">
+		0.000000, 0.000000, 0.000000;
+		-1;
+	</bone>
+</armature>
+<poses count="1">
+	0, 0;
+</poses>
+<animation count="1">
+	<bone id="Bone">
+		-0.00000, 0.00000, 0.00000;
+		1.0000, 0.0000, -0.0000, -0.0000;
+		1.00000, 1.00000, 1.00000;
+	</bone>
+</animation>

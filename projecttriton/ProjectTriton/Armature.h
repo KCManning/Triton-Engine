@@ -7,7 +7,7 @@
 
 #define MAX_BONE_CHILDREN 10
 #define MAX_BONES 20
-#define MAX_ANIMATIONS 4
+#define MAX_ANIMATIONS 10
 
 using glm::vec3;
 using glm::quat;
@@ -50,6 +50,7 @@ namespace Triton
 		Animation anims[MAX_BONES];
 		FrameSet frameSets[MAX_ANIMATIONS];
 		unsigned short frameSet = 0;
+		unsigned short animCount = 0;
 		unsigned short boneCount = 0;
 		unsigned short currentFrame = 0;
 		unsigned short startFrame = 0;

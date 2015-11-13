@@ -12,7 +12,21 @@ ObjectEntity::ObjectEntity()
 
 void ObjectEntity::input(SDL_Event& e)
 {
-
+	if (e.type == SDL_KEYDOWN)
+	{
+		switch (e.key.keysym.sym)
+		{
+		case SDLK_t:
+		{
+			++(armature->frameSet);
+			if (armature->frameSet == armature->animCount)
+			{
+				armature->frameSet = 0;
+			}
+			break;
+		}
+		}
+	}
 }
 
 void ObjectEntity::update()

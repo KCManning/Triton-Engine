@@ -14,6 +14,7 @@ namespace Triton
 	class ObjectEntity
 	{
 	public:
+		bool player = false;
 		// objects position in 3d space
 		vec3 position;
 
