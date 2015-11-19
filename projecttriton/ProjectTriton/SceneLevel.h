@@ -25,6 +25,7 @@ namespace Triton
 		vector<Shader*> shaders;
 		vector<Material*> materials;
 		vector<ObjectEntity*> objects;
+		PointLight pointlights[MAX_POINTLIGHTS];
 
 		static Camera camera;
 

@@ -11,7 +11,7 @@ Shader* Shader::active = nullptr;
 Shader::Shader()
 {
 	handle = glCreateProgram();
-	for (unsigned short i = 0; i < UNIFORM_COUNT + MAX_BONES * 5; ++i)
+	for (unsigned short i = 0; i < UNIFORM_COUNT + MAX_BONES * 5 + MAX_POINTLIGHTS * 4; ++i)
 		uniforms[i] = NULL;
 	for (unsigned short i = 0; i < SHADERTYPE_COUNT; ++i)
 		m_components[i] = NULL;
@@ -90,17 +90,26 @@ void Shader::bind()
 	active = this;
 
 	uniforms[CAMERA] = glGetUniformLocation(handle, "camera");
+	uniforms[CAMERAPOS] = glGetUniformLocation(handle, "eyePos");
 	uniforms[OBJECTPOS] = glGetUniformLocation(handle, "objectPos");
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
-		uniforms[UNIFORM_COUNT + i] = glGetUniformLocation(handle, ("offsets[" + std::to_string(i) + "]").c_str());
+		uniforms[UNIFORM_COUNT + i] = glGetUniformLocation(handle, ("offsets[" + to_string(i) + "]").c_str());
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
-		uniforms[UNIFORM_COUNT + MAX_BONES + i] = glGetUniformLocation(handle, ("rotations[" + std::to_string(i) + "]").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES + i] = glGetUniformLocation(handle, ("rotations[" + to_string(i) + "]").c_str());
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
-		uniforms[UNIFORM_COUNT + MAX_BONES*2 + i] = glGetUniformLocation(handle, ("parentIndices[" + std::to_string(i) + "]").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES*2 + i] = glGetUniformLocation(handle, ("parentIndices[" + to_string(i) + "]").c_str());
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
-		uniforms[UNIFORM_COUNT + MAX_BONES*3 + i] = glGetUniformLocation(handle, ("bonePos[" + std::to_string(i) + "]").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES*3 + i] = glGetUniformLocation(handle, ("bonePos[" + to_string(i) + "]").c_str());
 	for (unsigned short i = 0; i < MAX_BONES; ++i)
-		uniforms[UNIFORM_COUNT + MAX_BONES * 4 + i] = glGetUniformLocation(handle, ("scales[" + std::to_string(i) + "]").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES * 4 + i] = glGetUniformLocation(handle, ("scales[" + to_string(i) + "]").c_str());
+	for (unsigned short i = 0; i < MAX_POINTLIGHTS; ++i)
+	{
+		uniforms[UNIFORM_COUNT + MAX_BONES * 5 + i * 4] = glGetUniformLocation(handle, ("pointLights[" + to_string(i) + "].color").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 1] = glGetUniformLocation(handle, ("pointLights[" + to_string(i) + "].atten").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 2] = glGetUniformLocation(handle, ("pointLights[" + to_string(i) + "].intensity").c_str());
+		uniforms[UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 3] = glGetUniformLocation(handle, ("pointLights[" + to_string(i) + "].position").c_str());
+	}
+		
 }
 
 Shader::~Shader()

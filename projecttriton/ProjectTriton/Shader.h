@@ -1,6 +1,7 @@
 //-------------------------------------------------------------------------------------------------
 #pragma once
 #include "GL\glew.h"
+#include "Light.h"
 #define GLM_SWIZZLE
 #define MAX_BONES 20
 
@@ -31,6 +32,7 @@ namespace Triton
 		enum Uniforms
 		{
 			CAMERA,
+			CAMERAPOS,
 			OBJECTPOS,
 			UNIFORM_COUNT
 		};
@@ -67,7 +69,7 @@ namespace Triton
 		// sets this as the program openGL is currently using
 		void bind();
 
-		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*5];
+		GLuint uniforms[UNIFORM_COUNT + MAX_BONES*5 + MAX_POINTLIGHTS*4];
 	
 		// destructor
 		~Shader();

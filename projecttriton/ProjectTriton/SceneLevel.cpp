@@ -8,7 +8,13 @@ Camera SceneLevel::camera;
 
 SceneLevel::SceneLevel()
 {
-	
+	for (unsigned short i = 0; i < MAX_POINTLIGHTS; ++i)
+	{
+		pointlights[i].color = vec3();
+		pointlights[i].atten = vec3();
+		pointlights[i].intensity = 0;
+		pointlights[i].position = vec3();
+	}
 }
 
 void SceneLevel::update()
@@ -34,6 +40,8 @@ void SceneLevel::draw()
 
 		glUniformMatrix4fv(Shader::active->uniforms[Shader::Uniforms::CAMERA], 1, GL_FALSE,
 		 	&camera.getViewProjection()[0][0]);
+		glUniform3fv(Shader::active->uniforms[Shader::Uniforms::CAMERAPOS], 1,
+			&camera.pos[0]);
 		glUniform3fv(Shader::active->uniforms[Shader::Uniforms::OBJECTPOS], 1, 
 			&(*it)->position[0]);
 		if ((*it)->armature != nullptr)
@@ -87,6 +95,17 @@ void SceneLevel::draw()
 			{
 				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 4 + i], 1,
 					&(*it)->armature->anims[i].scales[(*it)->armature->currentFrame][0]);
+			}
+			for (unsigned short i = 0; i < MAX_POINTLIGHTS; ++i)
+			{
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 5 + i * 4], 1,
+					&pointlights[i].color[0]);
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 1], 1,
+					&pointlights[i].atten[0]);
+				glUniform1f(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 2],
+					pointlights[i].color[0]);
+				glUniform3fv(Shader::active->uniforms[Shader::Uniforms::UNIFORM_COUNT + MAX_BONES * 5 + i * 4 + 3], 1,
+					&pointlights[i].position[0]);
 			}
 		}
 		

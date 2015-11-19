@@ -48,6 +48,20 @@
 			-->
 		</object>
 	</objects>
+	<lights>
+		<color>
+			0.25, 0.5, 1.0;
+		</color>
+		<attenuation>
+			0.0, 0.0, 0.5;
+		</attenuation>
+		<intensity>
+			2.0;
+		</intensity>
+		<position>
+			0.0, 1.0, -1.0;
+		</position>
+	</lights>
 	<!--not yet implemented--
 	<scripts
 	</scripts

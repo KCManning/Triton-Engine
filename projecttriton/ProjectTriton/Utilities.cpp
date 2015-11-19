@@ -605,6 +605,34 @@ void Triton::parse(const char* filepath, SceneLevel*& type)
 						objectDirectory.append((*(++it)).c_str());
 				} // end while
 			} // end else if
+			else if (*it == "lights")
+			{
+				unsigned short pointLightCount = 0;
+				while (*(++it) != "/lights")
+				{
+					if (*it == "color")
+					{
+						float x, y, z;
+						x = stof(*(++it));
+						y = stof(*(++it));
+						z = stof(*(++it));
+						parser.currentScene->pointlights[pointLightCount].color = vec3(x, y, z);
+						advance(it, 2);
+						x = stof(*(++it));
+						y = stof(*(++it));
+						z = stof(*(++it));
+						parser.currentScene->pointlights[pointLightCount].atten = vec3(x, y, z);
+						advance(it, 2);
+						x = stof(*(++it));
+						parser.currentScene->pointlights[pointLightCount].intensity = x;
+						advance(it, 2);
+						x = stof(*(++it));
+						y = stof(*(++it));
+						z = stof(*(++it));
+						parser.currentScene->pointlights[pointLightCount++].position = vec3(x, y, z);
+					}
+				}
+			}
 #pragma endregion
 		}
 

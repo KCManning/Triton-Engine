@@ -254,11 +254,36 @@ def ExportArmature(armature, filepath, matrix, scene_context):
 	armature.matrix_world = armature.matrix_world * matrix.inverted()
 	bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 	
-	ArmatureFile.Write("<animation count=\"%d\">" % (scene_context.frame_end - scene_context.frame_start + 1))
-	ArmatureFile.Indent()
-		
+	poses = None
+	poseCount = 0
+	if armature.pose_library is not None:
+		poseCount = len(armature.pose_library.pose_markers)
+	
+	poses = []
+	if poseCount == 0:
+		poses.append(ExportPose(scene_context.frame_start))
+		poseCount += 1
+	else:
+		poses.extend(armature.pose_library.pose_markers)
+	
 	bpy.ops.object.mode_set(mode='POSE')
 	
+	ArmatureFile.Write("<poses count=\"%d\">" % (poseCount))
+	ArmatureFile.Indent()
+	
+	for i, pose in enumerate(poses):
+		frame_start = pose.frame - scene_context.frame_start
+		frame_end = scene_context.frame_end - 1
+		if(i != poseCount - 1):
+			frame_end = poses[i + 1].frame - scene_context.frame_start - 1
+		ArmatureFile.Write("%d, %d;" % (frame_start, frame_end))
+			
+	ArmatureFile.Unindent()
+	ArmatureFile.Write("</poses>")
+		
+	ArmatureFile.Write("<animation count=\"%d\">" % (scene_context.frame_end - scene_context.frame_start + 1))
+	ArmatureFile.Indent()
+
 	for bone in armature.pose.bones:
 		ArmatureFile.Write("<bone id=\"%s\">" % (bone.name))
 		ArmatureFile.Indent()
@@ -318,7 +343,7 @@ def ExportArmature(armature, filepath, matrix, scene_context):
 		
 		ArmatureFile.Unindent()
 		ArmatureFile.Write("</bone>")
-		
+	
 	ArmatureFile.Unindent()
 	ArmatureFile.Write("</animation>")
 	
@@ -328,6 +353,10 @@ def ExportArmature(armature, filepath, matrix, scene_context):
 	armature.select = False
 	scene_context.objects.active = None
 	scene_context.frame_set(0)
+	
+class ExportPose:
+	def __init__(self, frame):
+		self.frame = frame
 		
 class File:
 	def __init__(self, Filepath):

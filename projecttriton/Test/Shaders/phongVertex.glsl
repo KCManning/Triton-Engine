@@ -20,6 +20,7 @@ uniform vec3 scales[MAX_BONES];
 out vec2 texCoord0;
 out vec3 normal0;
 out vec3 worldPos0;
+out vec3 eyePos;
 
 vec4 conjugate(vec4 quat)
 {
@@ -40,15 +41,6 @@ mat4 quatToMatrix(vec4 q0, vec3 t0, vec3 s0)
 	2.0*q0.x*q0.z - 2.0*q0.y*q0.w, 				2.0*q0.y*q0.z + 2.0*q0.x*q0.w, 				s0.z*(1.0 - 2.0*q0.x*q0.x - 2.0*q0.y*q0.y), 	0.0,
 	t0.x, 									t0.y, 									t0.z, 									1.0);
 }
-
-//mat4 quatToMatrix(vec4 q0, vec3 t0, vec3 s0)
-//{
-//	return mat4(
-//	(1.0 - 2.0*q0.y*q0.y - 2.0*q0.z*q0.z), 	2.0*q0.x*q0.y - 2.0*q0.z*q0.w, 			2.0*q0.x*q0.z + 2.0*q0.y*q0.w, 			0.0,
-//	2.0*q0.x*q0.y + 2.0*q0.z*q0.w, 			(1.0 - 2.0*q0.x*q0.x - 2.0*q0.z*q0.z), 	2.0*q0.y*q0.z - 2.0*q0.x*q0.w, 			0.0,
-//	2.0*q0.x*q0.z - 2.0*q0.y*q0.w, 			2.0*q0.y*q0.z + 2.0*q0.x*q0.w, 			(1.0 - 2.0*q0.x*q0.x - 2.0*q0.y*q0.y), 	0.0,
-//	t0.x, 								t0.y, 								t0.z, 								1.0);
-//}
 
 void main()
 {
@@ -83,9 +75,6 @@ void main()
 		
 		vec4 bone_offset = vec4(bonePos[index[i]], 0.0);
 		nVertex[i] -= bone_offset;
-		//nVertex[i].x *= scales[index[i]].x;
-		//nVertex[i].y *= scales[index[i]].z;
-		//nVertex[i].z *= scales[index[i]].y;
 		nVertex[i] = boneMat[index[i]] * nVertex[i];
 		nNormal[i] = boneMat[index[i]] * nNormal[i];
 		nVertex[i] += bone_offset;
